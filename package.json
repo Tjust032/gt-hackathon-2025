@@ -51,5 +51,12 @@
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.6",
     "typescript": "^5"
+  },
+  "overrides": {
+    "prosemirror-model": "1.25.3",
+    "prosemirror-state": "1.4.3",
+    "prosemirror-view": "1.41.1",
+    "prosemirror-transform": "1.10.4",
+    "prosemirror-commands": "1.7.1"
   }
 }
