@@ -1,36 +1,73 @@
-# Cedar-OS + Mastra Starter Template
+# Medicus 🏥
 
-A blank starter template combining [Cedar-OS](https://cedar.ai) for the frontend AI interface and [Mastra](https://mastra.ai) for the backend agent orchestration.
+**AI-Powered Medical Device Sales Platform**
 
-## Features
+Medicus is a digital platform that revolutionizes how medical device sales reps connect with healthcare providers, delivering the right information to the right provider at the right time.
 
-- **🤖 AI Chat Integration**: Built-in chat workflows powered by OpenAI through Mastra agents
-- **⚡ Real-time Streaming**: Server-sent events (SSE) for streaming AI responses
-- **🎨 Beautiful UI**: Cedar-OS components with 3D effects and modern design
-- **🔧 Type-safe Workflows**: Mastra-based backend with full TypeScript support
-- **📡 Dual API Modes**: Both streaming and non-streaming chat endpoints
+![Built with](https://img.shields.io/badge/Built%20with-React%20%7C%20Next.js%20%7C%20TypeScript-blue)
+![AI Powered](https://img.shields.io/badge/AI%20Powered-OpenAI%20%7C%20Mastra%20%7C%20Cedar-green)
+![Healthcare](https://img.shields.io/badge/Industry-Healthcare%20%7C%20Medical%20Devices-red)
 
-## Quick Start
+## 🌟 Inspiration
 
-The fastest way to get started:
+We were inspired by the challenge of improving HCP (Healthcare Provider) engagement. Doctors are often overwhelmed by irrelevant information, while sales reps spend time and money traveling to hospitals without knowing if their visit will add value. We wanted to create a solution that is smarter, more efficient, and more equitable: one that delivers the right information, to the right provider, at the right time.
 
-```bash
-npx cedar-os-cli plant-seed
-```
+## 🚀 What Medicus Does
 
-Then select this template when prompted. This will set up the entire project structure and dependencies automatically.
+Medicus is a digital platform that allows medical device sales reps to upload their products, complete with clinical research, safety data, and use cases. Using an AI search engine, doctors can easily preview relevant information before a sales visit. This helps doctors get the right information at the right time, while sales reps save resources and focus their visits on the hospitals that will truly benefit.
 
-This template contains the Cedar chat connected to a mastra backend to demonstrate what endpoints need to be implemented.
+### Key Features
 
-For more details, see the [Cedar Getting Started Guide](https://docs.cedarcopilot.com/getting-started/getting-started).
+- **📱 Smart Device Management**: Upload medical devices with clinical data, safety information, and use cases
+- **🤖 AI-Powered Campaign Generation**: Generate personalized email campaigns using OpenAI
+- **📧 Intelligent Email Delivery**: Send targeted communications to healthcare providers
+- **📊 Analytics Dashboard**: Track campaign performance and device engagement
+- **🔍 HCP Database**: Manage healthcare provider contacts and specialties
+- **📄 Clinical Research Integration**: Upload and manage PDFs, clinical trials, and research papers
+- **🎯 Smart Link Generation**: Create trackable device information pages
+- **💡 Real-time AI Assistance**: Cedar-OS powered chat for doctors to interact with the information.
 
-## Manual Setup
+## 🛠️ How We Built It
+
+We built Medicus with a modern, reliable stack that balances speed, scalability, and security:
+
+### Frontend
+
+- **Next.js 15.4.4** with App Router - React framework
+- **React 19.1.0** - Latest React with server components
+- **TypeScript** - Type-safe development
+- **Tailwind CSS 4.x** - Modern utility-first styling
+- **Cedar-OS** - AI copilot framework for intelligent UX
+- **Radix UI** - Accessible headless components
+- **Framer Motion** - Smooth animations and transitions
+
+### Backend & AI
+
+- **Mastra** - Backend framework for AI agent orchestration
+- **OpenAI GPT-4** - AI-powered content generation
+- **Zod** - Schema validation for robust data integrity
+- **LibSQL** - SQLite-compatible database for device and user data
+
+### Email & Communication
+
+- **React Email** - Beautiful, responsive email templates
+- **Gmail HTML Email API** - Reliable email delivery service
+
+### Development & Deployment
+
+- **Docker** - Containerized deployment for consistency
+- **Turbopack** - Fast development bundler
+- **ESLint & Prettier** - Code quality and formatting
+
+This stack enabled us to rapidly prototype while building toward a system that can scale in real-world healthcare environments.
+
+## 🏃‍♂️ Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - OpenAI API key
-- pnpm (recommended) or npm
+- npm or pnpm
 
 ### Installation
 
@@ -38,15 +75,15 @@ For more details, see the [Cedar Getting Started Guide](https://docs.cedarcopilo
 
 ```bash
 git clone <repository-url>
-cd cedar-mastra-starter
-pnpm install && cd src/backend && pnpm install && cd ../..
+cd gt-hackathon-2025
+npm install && cd src/backend && npm install && cd ../..
 ```
 
 2. **Set up environment variables:**
    Create a `.env` file in the root directory:
 
-```env
-OPENAI_API_KEY=your-openai-api-key-here
+```bash
+echo "OPENAI_API_KEY=your-api-key-here" > .env
 ```
 
 3. **Start the development servers:**
@@ -57,78 +94,92 @@ npm run dev
 
 This runs both the Next.js frontend and Mastra backend concurrently:
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:4111
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:4111
 
-## Project Architecture
+## 🎯 Key Workflows
 
-### Frontend (Next.js + Cedar-OS)
+### For Sales Representatives
 
-- **Simple Chat UI**: See Cedar OS components in action in a pre-configured chat interface
-- **Cedar-OS Components**: Cedar-OS Components installed in shadcn style for local changes
-- **Tailwind CSS, Typescript, NextJS**: Patterns you're used to in any NextJS project
+1. **Device Registration**: Upload medical devices with clinical research and safety data
+2. **Campaign Creation**: Generate AI-powered, personalized email campaigns
+3. **HCP Targeting**: Select specific healthcare provider specialties and demographics
+4. **Performance Tracking**: Monitor email engagement and device interest
 
-### Backend (Mastra)
+### For Healthcare Providers
 
-- **Chat Workflow**: Example of a Mastra workflow – a chained sequence of tasks including LLM calls
-- **Streaming Utils**: Examples of streaming text, status updates, and objects like tool calls
-- **API Routes**: Examples of registering endpoint handlers for interacting with the backend
+1. **Device Discovery**: Browse and search medical devices relevant to their specialty
+2. **Clinical Review**: Access clinical research, safety data, and use cases
+3. **Smart Links**: Preview device information before sales meetings
+4. **Informed Decisions**: Make better-informed purchasing decisions
 
-## API Endpoints (Mastra backend)
+## 🚧 Challenges We Overcame
 
-### Non-streaming Chat
+A major challenge was balancing information delivery - we wanted to avoid spamming doctors with jargon while ensuring they have the resources to benefit from the platform. We had to ideate different workflows that work equally well for sales reps and doctors, who have very different needs and time constraints.
 
-```bash
-POST /chat/execute-function
-Content-Type: application/json
+## 🏆 Accomplishments We're Proud Of
 
-{
-  "prompt": "Hello, how can you help me?",
-  "temperature": 0.7,
-  "maxTokens": 1000,
-  "systemPrompt": "You are a helpful assistant."
-}
+- **⚡ Rapid Development**: Built a functional prototype in under 36 hours
+- **🎨 User-Centric Design**: Created workflows that support both reps and doctors
+- **🌍 Social Impact**: Developed a solution that could expand access to rural and underfunded hospitals
+- **🤖 AI Integration**: Successfully implemented intelligent campaign generation
+- **📧 Email Automation**: Built seamless email delivery with beautiful templates
+
+## 📚 What We Learned
+
+The healthcare system is quite complex, and navigating it to create an effective tool is challenging. User input and feedback would have been instrumental - we'd like to thank the team at Impiricus for their valuable feedback and ideas.
+
+## 🔮 What's Next for Medicus
+
+We see countless possibilities for Medicus:
+
+- **🏢 Enterprise Partnerships**: Pitch to med-tech companies like Medtronic or J&J
+- **📈 Advanced Analytics**: Implement predictive analytics for sales optimization
+- **🌐 Global Expansion**: Scale to international healthcare markets
+- **🔒 Enhanced Security**: Implement advanced healthcare data protection
+- **📱 Mobile Apps**: Native mobile applications for on-the-go access
+
+## 🏗️ Project Architecture
+
+### Frontend Structure
+
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── dashboard/         # Main dashboard pages
+│   ├── device/           # Device detail pages
+│   └── api/              # API routes
+├── components/           # React components
+│   └── medical-device/   # Domain-specific components
+├── cedar/               # Cedar-OS components
+└── lib/                 # Utilities and mock data
 ```
 
-### Streaming Chat
+### Backend Structure
 
-```bash
-POST /chat/execute-function/stream
-Content-Type: application/json
-
-{
-  "prompt": "Tell me a story",
-  "temperature": 0.7
-}
+```
+src/backend/
+├── src/mastra/          # Mastra configuration
+│   ├── agents/         # AI agents
+│   ├── tools/          # Custom tools
+│   └── workflows/      # Process workflows
+└── storage.db          # SQLite database
 ```
 
-Returns Server-Sent Events with:
+## 🤝 Contributing
 
-- **JSON Objects**: `{ type: 'stage_update', status: 'update_begin', message: 'Generating response...'}`
-- **Text Chunks**: Streamed AI response text
-- **Completion**: `event: done` signal
+We welcome contributions! Please see our contributing guidelines for more details.
 
-## Development
-
-### Running the Project
-
-```bash
-# Start both frontend and backend
-npm run dev
-
-# Run frontend only
-npm run dev:next
-
-# Run backend only
-npm run dev:mastra
-```
-
-## Learn More
-
-- [Cedar-OS Documentation](https://docs.cedarcopilot.com/)
-- [Mastra Documentation](https://mastra.ai/docs)
-- [Next.js Documentation](https://nextjs.org/docs)
-
-## License
+## 📜 License
 
 MIT License - see LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- **Impiricus Team** - For valuable feedback and healthcare industry insights
+- **GT Hackathon 2025** - For providing the platform to build this solution
+- **Cedar-OS & Mastra Teams** - For the excellent development frameworks
+
+---
+
+**Built with ❤️ for healthcare innovation at GT Hackathon 2025**
