@@ -74,7 +74,7 @@ This stack enabled us to rapidly prototype while building toward a system that c
 1. **Clone and install dependencies:**
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Tjust032/gt-hackathon-2025
 cd gt-hackathon-2025
 npm install && cd src/backend && npm install && cd ../..
 ```
