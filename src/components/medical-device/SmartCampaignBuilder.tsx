@@ -20,6 +20,9 @@ import {
   Code,
   Edit3,
   Save,
+  Loader2,
+  Check,
+  AlertCircle,
 } from 'lucide-react';
 
 interface SmartCampaignBuilderProps {
@@ -87,6 +90,11 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
       }
     | undefined
   >(undefined);
+
+  // Email sending states
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const campaignTypes = [
     {
@@ -269,37 +277,102 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
 
     if (!finalContent || !finalSubject) return;
 
-    const campaign: Campaign = {
-      id: `camp_${Date.now()}`,
-      deviceId: selectedDevice,
-      deviceName: devices.find((d) => d.id === selectedDevice)?.name || '',
-      hcpTags,
-      campaignType,
-      subject: processTemplate(finalSubject),
-      content: processTemplate(finalContent),
-      variables,
-      status: 'sent',
-      createdAt: new Date().toISOString(),
-      sentAt: new Date().toISOString(),
-      recipientCount: Math.floor(Math.random() * 50) + 10,
-    };
+    setIsSendingEmail(true);
+    setEmailError(null);
+    setEmailSent(false);
 
-    onCampaignLaunched?.(campaign);
-    setShowQuickLaunchModal(false);
+    try {
+      // Convert the email content to HTML for sending
+      let htmlContent = finalContent;
 
-    // Reset form
-    setSelectedDevice('');
-    setHcpTags([]);
-    setCampaignType('');
-    setStreamedContent('');
-    setStreamedSubject('');
-    setEditableContent('');
-    setEditableSubject('');
-    setIsEditing(false);
-    setShowPreview(false);
-    setRenderedHtml('');
-    setStructuredData(undefined);
-    setSalesRep(undefined);
+      // If we have rendered HTML from preview, use that
+      if (renderedHtml) {
+        htmlContent = renderedHtml;
+      } else {
+        // Convert plain text to HTML
+        htmlContent = finalContent
+          .replace(/\n\n/g, '</p><p>')
+          .replace(/\n/g, '<br>')
+          .replace(/^\*\*(.*?)\*\*/gm, '<strong>$1</strong>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        htmlContent = `<p>${htmlContent}</p>`;
+      }
+
+      const device = devices.find((d) => d.id === selectedDevice);
+
+      // Send email via API
+      const response = await fetch('/api/send-campaign-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          html: htmlContent,
+          subject: processTemplate(finalSubject),
+          deviceName: device?.name || '',
+          campaignType,
+          targetHCPs: hcpTags.join(', '),
+          senderName: salesRep?.name || 'Sales Representative',
+          senderEmail: salesRep?.email || 'sales@medicaldevices.com',
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send email');
+      }
+
+      const result = await response.json();
+      console.log('Email sent successfully:', result);
+
+      // Mark as sent and create campaign record
+      setEmailSent(true);
+
+      // Wait a moment to show success animation
+      setTimeout(() => {
+        const campaign: Campaign = {
+          id: `camp_${Date.now()}`,
+          deviceId: selectedDevice,
+          deviceName: device?.name || '',
+          hcpTags,
+          campaignType,
+          subject: processTemplate(finalSubject),
+          content: processTemplate(finalContent),
+          variables,
+          status: 'sent',
+          createdAt: new Date().toISOString(),
+          sentAt: new Date().toISOString(),
+          recipientCount: Math.floor(Math.random() * 50) + 10,
+        };
+
+        onCampaignLaunched?.(campaign);
+        setShowQuickLaunchModal(false);
+
+        // Reset form after delay
+        setTimeout(() => {
+          setSelectedDevice('');
+          setHcpTags([]);
+          setCampaignType('');
+          setStreamedContent('');
+          setStreamedSubject('');
+          setEditableContent('');
+          setEditableSubject('');
+          setIsEditing(false);
+          setShowPreview(false);
+          setRenderedHtml('');
+          setStructuredData(undefined);
+          setSalesRep(undefined);
+          setIsSendingEmail(false);
+          setEmailSent(false);
+          setEmailError(null);
+        }, 2000);
+      }, 1500);
+    } catch (error) {
+      console.error('Error sending campaign email:', error);
+      setEmailError(error instanceof Error ? error.message : 'Failed to send email');
+      setIsSendingEmail(false);
+    }
   };
 
   const handleModalClick = (e: React.MouseEvent) => {
@@ -656,17 +729,91 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
 
                   {/* Action Buttons */}
                   <div className="flex gap-3 pt-4 border-t border-gray-200">
-                    <Button
-                      onClick={handleSendCampaign}
-                      disabled={!streamedContent || !streamedSubject}
-                      className="flex-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white"
-                    >
-                      <Send className="w-4 h-4 mr-2" />
-                      Send Campaign
-                    </Button>
-                    <Button onClick={() => setShowQuickLaunchModal(false)} variant="outline">
-                      Cancel
-                    </Button>
+                    {isSendingEmail || emailSent || emailError ? (
+                      <div className="flex-1 flex flex-col items-center justify-center py-8">
+                        {(isSendingEmail || emailSent) && (
+                          <div className="text-center">
+                            <div
+                              className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 transition-all duration-700 ease-in-out ${
+                                emailSent ? 'bg-green-100 scale-110' : 'bg-blue-100'
+                              }`}
+                            >
+                              <div
+                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-700 ease-in-out ${
+                                  emailSent
+                                    ? 'bg-green-500 rotate-[360deg] scale-110'
+                                    : 'bg-blue-500'
+                                }`}
+                              >
+                                {emailSent ? (
+                                  <Check className="w-5 h-5 text-white transition-all duration-500 ease-in-out scale-110" />
+                                ) : (
+                                  <Loader2 className="w-5 h-5 text-white animate-spin" />
+                                )}
+                              </div>
+                            </div>
+                            <p
+                              className={`text-sm font-medium transition-colors duration-500 ${
+                                emailSent ? 'text-green-600' : 'text-gray-600'
+                              }`}
+                            >
+                              {emailSent ? 'Email sent successfully!' : 'Sending campaign email...'}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1 transition-opacity duration-300">
+                              {emailSent
+                                ? 'Campaign has been launched'
+                                : 'Please wait while we deliver your message'}
+                            </p>
+                          </div>
+                        )}
+
+                        {emailError && (
+                          <div className="text-center">
+                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                              <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                                <AlertCircle className="w-5 h-5 text-white" />
+                              </div>
+                            </div>
+                            <p className="text-sm text-red-600 font-medium">Failed to send email</p>
+                            <p className="text-xs text-gray-500 mt-1">{emailError}</p>
+                            <Button
+                              onClick={() => {
+                                setEmailError(null);
+                                setIsSendingEmail(false);
+                              }}
+                              size="sm"
+                              variant="outline"
+                              className="mt-3"
+                            >
+                              Try Again
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={handleSendCampaign}
+                          disabled={!streamedContent || !streamedSubject || isSendingEmail}
+                          className="flex-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white disabled:opacity-50"
+                        >
+                          {isSendingEmail ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Sending...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4 mr-2" />
+                              Send Campaign
+                            </>
+                          )}
+                        </Button>
+                        <Button onClick={() => setShowQuickLaunchModal(false)} variant="outline">
+                          Cancel
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
