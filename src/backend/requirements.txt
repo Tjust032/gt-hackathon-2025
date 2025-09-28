@@ -1,0 +1,9 @@
+# PDF Processing Libraries (install at least one)
+PyMuPDF>=1.23.0
+PyPDF2>=3.0.0
+pdfplumber>=0.9.0
+
+# Alternative: Install just one of the above
+# For best results, use PyMuPDF: pip install PyMuPDF
+# For compatibility, use PyPDF2: pip install PyPDF2
+# For advanced features, use pdfplumber: pip install pdfplumber

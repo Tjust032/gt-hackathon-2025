@@ -108,8 +108,66 @@ export function DeviceRegistrationForm({
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Register Device button clicked!');
+
+    // Generate unique device registration ID
+    const deviceRegistrationId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    console.log('Device Registration ID:', deviceRegistrationId);
+
+    // Process PDF files when Register Device is clicked
+    for (const file of formData.clinicalFiles) {
+      if (file instanceof File && file.type === 'application/pdf') {
+        console.log('PDF uploaded:', file.name);
+
+        try {
+          // Create FormData to send the PDF file
+          const formDataToSend = new FormData();
+          formDataToSend.append('pdf', file);
+          formDataToSend.append('deviceRegistrationId', deviceRegistrationId);
+
+          // Make API call to extract PDF text
+          const response = await fetch('/api/extract-pdf', {
+            method: 'POST',
+            body: formDataToSend,
+          });
+
+          const result = await response.json();
+
+          // Debug: Log the full response
+          console.log('Full API response:', result);
+
+          if (result.success) {
+            console.log('PDF extraction successful for:', file.name);
+            console.log('Full extracted text:', result.content);
+            console.log('First 5 lines:', result.firstFiveLines);
+            console.log('Page count:', result.pageCount);
+            console.log('Character count:', result.characterCount);
+
+            // Log database insertion info if available
+            if (result.database_inserted) {
+              console.log('Database insertion successful!');
+              console.log(
+                'Device Registration ID:',
+                result.database_inserted.device_registration_id,
+              );
+              console.log('Document ID:', result.database_inserted.document_id);
+              console.log('Chunk ID:', result.database_inserted.chunk_id);
+              console.log('Session ID:', result.database_inserted.session_id);
+              console.log('Content:', result.database_inserted.content);
+            } else if (result.database_error) {
+              console.error('Database insertion failed:', result.database_error);
+            }
+          } else {
+            console.error('PDF extraction failed for:', file.name, result.error);
+          }
+        } catch (error) {
+          console.error('Error processing PDF:', file.name, error);
+        }
+      }
+    }
+
     // This would trigger the Cedar agent's submitDevice tool
     console.log('Form submitted:', formData);
   };
