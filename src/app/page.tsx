@@ -17,6 +17,11 @@ import { DebuggerPanel } from '@/cedar/components/debugger';
 type ChatMode = 'floating' | 'sidepanel' | 'caption';
 
 export default function HomePage() {
+  // Redirect to dashboard for medical device campaign center
+  React.useEffect(() => {
+    window.location.href = '/dashboard';
+  }, []);
+
   // Cedar-OS chat components with mode selector
   // Choose between caption, floating, or side panel chat modes
   const [chatMode, setChatMode] = React.useState<ChatMode>('sidepanel');
