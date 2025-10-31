@@ -187,12 +187,14 @@ export function DevicePageClient({ device }: DevicePageClientProps) {
   );
 
   // Subscribe document context to Cedar agent - this injects PDF text into LLM prompts
+  const DOCUMENT_CONTEXT_PREVIEW_LENGTH = 2000; // Characters to show in preview
+  
   useSubscribeStateToAgentContext(
     'documentContext',
     (context: string) => ({
       hasDocumentContext: context.length > 0,
       documentTextLength: context.length,
-      documentText: context.substring(0, 2000), // First 2000 chars for context
+      documentText: context.substring(0, DOCUMENT_CONTEXT_PREVIEW_LENGTH), // First N chars for context
       fullDocumentText: context, // Full text available to agent
     }),
     {
@@ -368,10 +370,29 @@ function generateClinicalResponseWithContext(
     // Simple keyword-based search in document context
     const sentences = documentContext.split(/[.!?]+/).filter((s) => s.trim().length > 0);
 
+    // Common stopwords to exclude from keyword search
+    const STOPWORDS = [
+      'this',
+      'that',
+      'what',
+      'about',
+      'with',
+      'from',
+      'have',
+      'they',
+      'will',
+      'would',
+      'there',
+      'their',
+      'when',
+      'where',
+      'which',
+    ];
+
     // Find sentences containing query keywords
     const keywords = queryLower
       .split(/\s+/)
-      .filter((word) => word.length > 3 && !['this', 'that', 'what', 'about'].includes(word));
+      .filter((word) => word.length > 3 && !STOPWORDS.includes(word));
 
     const relevantSentences = sentences.filter((sentence) => {
       const sentenceLower = sentence.toLowerCase();
@@ -380,7 +401,8 @@ function generateClinicalResponseWithContext(
 
     if (relevantSentences.length > 0) {
       // Return the most relevant sentences
-      const response = relevantSentences.slice(0, 3).join('. ') + '.';
+      const MAX_SENTENCES = 3;
+      const response = relevantSentences.slice(0, MAX_SENTENCES).join('. ') + '.';
       return `Based on the clinical documentation for ${device.name}:\n\n${response}`;
     }
   }

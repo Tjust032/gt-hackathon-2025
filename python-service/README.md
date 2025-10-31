@@ -4,6 +4,14 @@ This service extracts text from PDF files using PyPDF2 and generates embeddings 
 
 ## Setup
 
+**Note:** This service requires large ML packages (torch ~2GB, transformers ~500MB). 
+First-time installation may take several minutes. Ensure you have sufficient disk space.
+
+For production deployment, consider:
+- Using a smaller model or quantized version
+- Pre-loading the model in a Docker image
+- Using a model serving platform (e.g., TensorFlow Serving, Triton)
+
 1. Install Python dependencies:
 ```bash
 cd python-service
@@ -15,7 +23,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-The service will start on port 5000 by default.
+The service will start on port 5000 by default. First startup will download the BioBERT model (~400MB), which may take a few minutes.
 
 ## Endpoints
 
