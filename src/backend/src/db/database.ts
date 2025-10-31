@@ -87,7 +87,15 @@ export class DatabaseService {
   /**
    * Map database row to DocumentRecord
    */
-  private mapRowToDocument(row: any): DocumentRecord {
+  private mapRowToDocument(row: {
+    document_id: string;
+    listing_id: string;
+    original_filename: string;
+    storage_url: string;
+    upload_timestamp: Date;
+    extracted_text?: string;
+    embedding?: string;
+  }): DocumentRecord {
     return {
       document_id: row.document_id,
       listing_id: row.listing_id,

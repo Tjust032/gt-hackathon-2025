@@ -44,8 +44,11 @@ export function DevicePageClient({ device }: DevicePageClientProps) {
 
         if (data.success && data.documents) {
           // Combine all extracted text from documents
+          interface DocumentData {
+            extracted_text?: string;
+          }
           const combinedText = data.documents
-            .map((doc: any) => doc.extracted_text || '')
+            .map((doc: DocumentData) => doc.extracted_text || '')
             .filter((text: string) => text.length > 0)
             .join('\n\n');
 

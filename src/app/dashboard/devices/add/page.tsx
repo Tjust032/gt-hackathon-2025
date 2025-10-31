@@ -38,7 +38,7 @@ export default function AddDevicePage() {
   });
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [validationErrors, setValidationErrors] = React.useState<Record<string, string>>({});
+  const [validationErrors] = React.useState<Record<string, string>>({});
 
   // Register form state for Cedar
   useRegisterState({
