@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 interface DocumentRecord {
   document_id: string;
-  listing_id: string;
+  listing_id: number; // Changed to number
   original_filename: string;
   storage_url: string;
   upload_timestamp: string;
@@ -17,10 +17,15 @@ interface DocumentRecord {
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
-    const listingId = searchParams.get('listingId');
+    const listingIdStr = searchParams.get('listingId');
 
-    if (!listingId) {
+    if (!listingIdStr) {
       return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
+    }
+
+    const listingId = parseInt(listingIdStr, 10);
+    if (isNaN(listingId)) {
+      return NextResponse.json({ error: 'Listing ID must be a number' }, { status: 400 });
     }
 
     // In production, fetch from PostgreSQL database

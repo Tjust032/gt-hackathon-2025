@@ -28,7 +28,7 @@ export interface ClinicalFile {
 
 export interface DocumentRecord {
   document_id: string; // UUID
-  listing_id: string; // Device ID
+  listing_id: number; // Auto-incrementing listing ID (1, 2, 3, ...)
   original_filename: string;
   storage_url: string; // Where the PDF lives
   upload_timestamp: string;

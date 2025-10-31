@@ -14,7 +14,7 @@ const pool = new Pool({
 
 export interface DocumentRecord {
   document_id: string;
-  listing_id: string;
+  listing_id: number; // Changed to number (auto-increment)
   original_filename: string;
   storage_url: string;
   upload_timestamp: Date;
@@ -22,12 +22,33 @@ export interface DocumentRecord {
   embedding?: number[];
 }
 
+export interface ListingRecord {
+  listing_id: number; // Auto-incrementing SERIAL
+  device_name: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export class DatabaseService {
+  /**
+   * Create a new listing and return the auto-generated ID
+   */
+  async createListing(deviceName: string): Promise<number> {
+    const query = `
+      INSERT INTO listings (device_name)
+      VALUES ($1)
+      RETURNING listing_id
+    `;
+
+    const result = await pool.query(query, [deviceName]);
+    return result.rows[0].listing_id;
+  }
+
   /**
    * Insert a new document record
    */
   async insertDocument(
-    listingId: string,
+    listingId: number, // Changed from string to number
     filename: string,
     storageUrl: string,
     extractedText?: string,
@@ -55,7 +76,7 @@ export class DatabaseService {
   /**
    * Get all documents for a listing
    */
-  async getDocumentsByListingId(listingId: string): Promise<DocumentRecord[]> {
+  async getDocumentsByListingId(listingId: number): Promise<DocumentRecord[]> {
     const query = `
       SELECT * FROM documents
       WHERE listing_id = $1
@@ -89,7 +110,7 @@ export class DatabaseService {
    */
   private mapRowToDocument(row: {
     document_id: string;
-    listing_id: string;
+    listing_id: number; // Changed to number
     original_filename: string;
     storage_url: string;
     upload_timestamp: Date;

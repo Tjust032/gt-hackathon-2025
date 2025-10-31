@@ -5,7 +5,7 @@ const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || 'http://localhost:5
 
 interface DocumentRecord {
   document_id: string;
-  listing_id: string;
+  listing_id: number; // Changed to number
   original_filename: string;
   storage_url: string;
   upload_timestamp: string;
@@ -17,10 +17,15 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const files = formData.getAll('files');
-    const listingId = formData.get('listingId') as string;
+    const listingIdStr = formData.get('listingId') as string;
 
-    if (!listingId) {
+    if (!listingIdStr) {
       return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
+    }
+
+    const listingId = parseInt(listingIdStr, 10);
+    if (isNaN(listingId)) {
+      return NextResponse.json({ error: 'Listing ID must be a number' }, { status: 400 });
     }
 
     if (!files || files.length === 0) {
@@ -67,7 +72,7 @@ export async function POST(req: NextRequest) {
         // Prepare document record
         const documentRecord: DocumentRecord = {
           document_id: uuidv4(),
-          listing_id: listingId,
+          listing_id: listingId, // Now a number
           original_filename: file.name,
           storage_url: storageUrl,
           upload_timestamp: new Date().toISOString(),

@@ -97,16 +97,27 @@ export default function AddDevicePage() {
       setIsSubmitting(true);
 
       try {
-        // Generate unique listing ID
-        const listingId = `device-${Date.now()}`;
+        // Create listing and get auto-incremented ID
+        const createResponse = await fetch('/api/create-listing', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deviceName: formData.name }),
+        });
 
-        console.log('Submitting device:', formData);
+        const createResult = await createResponse.json();
+        if (!createResult.success) {
+          throw new Error('Failed to create listing');
+        }
+
+        const listingId = createResult.listingId; // This is now a number (1, 2, 3, ...)
+
+        console.log('Submitting device with listing ID:', listingId, formData);
 
         // Process PDF files if any
         const pdfFiles = formData.clinicalFiles.filter((file) => file instanceof File);
         if (pdfFiles.length > 0) {
           const pdfFormData = new FormData();
-          pdfFormData.append('listingId', listingId);
+          pdfFormData.append('listingId', listingId.toString());
 
           pdfFiles.forEach((file) => {
             pdfFormData.append('files', file);
