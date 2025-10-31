@@ -26,6 +26,16 @@ export interface ClinicalFile {
   extractedContent?: string;
 }
 
+export interface DocumentRecord {
+  document_id: string; // UUID
+  listing_id: string; // Device ID
+  original_filename: string;
+  storage_url: string; // Where the PDF lives
+  upload_timestamp: string;
+  extracted_text?: string;
+  embedding?: number[]; // BioBERT embedding vector
+}
+
 export type MedicalCategory =
   | 'Heart/Cardiovascular'
   | 'Brain/Neurological'

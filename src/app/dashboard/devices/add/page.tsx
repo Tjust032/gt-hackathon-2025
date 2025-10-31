@@ -97,16 +97,40 @@ export default function AddDevicePage() {
       setIsSubmitting(true);
 
       try {
-        // Simulate form submission
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // Generate unique listing ID
+        const listingId = `device-${Date.now()}`;
 
         console.log('Submitting device:', formData);
 
+        // Process PDF files if any
+        const pdfFiles = formData.clinicalFiles.filter((file) => file instanceof File);
+        if (pdfFiles.length > 0) {
+          const pdfFormData = new FormData();
+          pdfFormData.append('listingId', listingId);
+
+          pdfFiles.forEach((file) => {
+            pdfFormData.append('files', file);
+          });
+
+          // Call PDF processing API
+          const response = await fetch('/api/process-pdfs', {
+            method: 'POST',
+            body: pdfFormData,
+          });
+
+          const result = await response.json();
+          console.log('PDF processing result:', result);
+        }
+
+        // Simulate additional device registration steps
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         // Redirect to devices page
         window.location.href = '/dashboard/devices';
-      } catch {
+      } catch (error) {
         setIsSubmitting(false);
-        console.log('Failed to register device. Please try again.');
+        console.error('Failed to register device:', error);
+        alert('Failed to register device. Please try again.');
       }
     },
   });
