@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import FormData from 'form-data';
 import { v4 as uuidv4 } from 'uuid';
 
 const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || 'http://localhost:5000';
+
+interface DocumentRecord {
+  document_id: string;
+  listing_id: string;
+  original_filename: string;
+  storage_url: string;
+  upload_timestamp: string;
+  extracted_text?: string;
+  embedding?: number[];
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,7 +27,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 });
     }
 
-    const processedDocuments = [];
+    const processedDocuments: DocumentRecord[] = [];
 
     for (const file of files) {
       if (!(file instanceof File)) {
@@ -33,17 +42,14 @@ export async function POST(req: NextRequest) {
       try {
         // Create FormData for Python service
         const pythonFormData = new FormData();
-        const buffer = Buffer.from(await file.arrayBuffer());
-        pythonFormData.append('file', buffer, {
-          filename: file.name,
-          contentType: 'application/pdf',
-        });
+        const buffer = await file.arrayBuffer();
+        const blob = new Blob([buffer], { type: 'application/pdf' });
+        pythonFormData.append('file', blob, file.name);
 
         // Call Python service to extract text and generate embedding
         const response = await fetch(`${PYTHON_SERVICE_URL}/extract-and-embed`, {
           method: 'POST',
-          body: pythonFormData as any,
-          headers: pythonFormData.getHeaders(),
+          body: pythonFormData,
         });
 
         if (!response.ok) {
@@ -59,7 +65,7 @@ export async function POST(req: NextRequest) {
         const storageUrl = `/uploads/${listingId}/${file.name}`;
 
         // Prepare document record
-        const documentRecord = {
+        const documentRecord: DocumentRecord = {
           document_id: uuidv4(),
           listing_id: listingId,
           original_filename: file.name,

@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface DocumentRecord {
+  document_id: string;
+  listing_id: string;
+  original_filename: string;
+  storage_url: string;
+  upload_timestamp: string;
+  extracted_text?: string;
+  embedding?: number[];
+}
+
 /**
  * GET /api/documents?listingId=xxx
  * Retrieve all documents for a specific listing ID
@@ -18,7 +28,7 @@ export async function GET(req: NextRequest) {
     // const documents = await dbService.getDocumentsByListingId(listingId);
 
     // For now, return mock data
-    const documents = [];
+    const documents: DocumentRecord[] = [];
 
     return NextResponse.json({
       success: true,
