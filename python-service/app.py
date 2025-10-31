@@ -135,7 +135,10 @@ def extract_and_embed():
         })
         
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Log the actual error for debugging
+        app.logger.error(f"Error in extract-and-embed: {str(e)}", exc_info=True)
+        # Return generic error message to user
+        return jsonify({"error": "Failed to process PDF file"}), 500
 
 
 @app.route('/embed-text', methods=['POST'])
@@ -170,7 +173,10 @@ def embed_text():
         })
         
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Log the actual error for debugging
+        app.logger.error(f"Error in embed-text: {str(e)}", exc_info=True)
+        # Return generic error message to user
+        return jsonify({"error": "Failed to generate embedding"}), 500
 
 
 if __name__ == '__main__':
