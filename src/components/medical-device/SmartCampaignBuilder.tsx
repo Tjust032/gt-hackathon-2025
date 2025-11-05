@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MedicalDevice } from '@/lib/mockData';
+import { PrescriptionDrug } from '@/lib/mockData';
 import { Button } from '@/cedar/components/ui/button';
 import { EmailTemplate } from './EmailTemplate';
 import { render } from '@react-email/render';
@@ -26,14 +26,14 @@ import {
 } from 'lucide-react';
 
 interface SmartCampaignBuilderProps {
-  devices: MedicalDevice[];
+  drugs: PrescriptionDrug[];
   onCampaignLaunched?: (campaign: Campaign) => void;
 }
 
 interface Campaign {
   id: string;
-  deviceId: string;
-  deviceName: string;
+  drugId: string;
+  drugName: string;
   hcpTags: string[];
   campaignType: string;
   subject: string;
@@ -45,8 +45,8 @@ interface Campaign {
   recipientCount?: number;
 }
 
-export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampaignBuilderProps) {
-  const [selectedDevice, setSelectedDevice] = useState<string>('');
+export function SmartCampaignBuilder({ drugs, onCampaignLaunched }: SmartCampaignBuilderProps) {
+  const [selectedDrug, setSelectedDrug] = useState<string>('');
   const [hcpTags, setHcpTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const [campaignType, setCampaignType] = useState<string>('');
@@ -100,14 +100,14 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
     {
       value: 'awareness',
       label: 'Awareness Campaign',
-      description: 'Build device awareness and interest',
+      description: 'Build drug awareness and interest',
     },
     {
       value: 'education',
       label: 'Educational Outreach',
       description: 'Share clinical evidence and data',
     },
-    { value: 'launch', label: 'Product Launch', description: 'Announce new device or features' },
+    { value: 'launch', label: 'Product Launch', description: 'Announce new drug or indications' },
     {
       value: 'follow-up',
       label: 'Follow-up Campaign',
@@ -160,8 +160,8 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
   };
 
   const handleQuickLaunch = async () => {
-    if (!selectedDevice || hcpTags.length === 0 || !campaignType) {
-      alert('Please select a device, add HCP tags, and choose a campaign type');
+    if (!selectedDrug || hcpTags.length === 0 || !campaignType) {
+      alert('Please select a drug, add HCP tags, and choose a campaign type');
       return;
     }
 
@@ -179,7 +179,7 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          deviceId: selectedDevice,
+          drugId: selectedDrug,
           hcpTags,
           campaignType,
           variables,
@@ -246,8 +246,8 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
       return;
     }
 
-    const device = devices.find((d) => d.id === selectedDevice);
-    if (!device) {
+    const drug = drugs.find((d) => d.id === selectedDrug);
+    if (!drug) {
       setRenderedHtml('');
       return;
     }
@@ -257,8 +257,8 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
         <EmailTemplate
           subject={processTemplate(currentSubject)}
           content={processTemplate(currentContent)}
-          deviceName={device.name}
-          companyName={device.company}
+          deviceName={drug.name}
+          companyName={drug.manufacturer}
           variables={variables}
           structuredData={structuredData}
           salesRep={salesRep}
@@ -299,7 +299,7 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
         htmlContent = `<p>${htmlContent}</p>`;
       }
 
-      const device = devices.find((d) => d.id === selectedDevice);
+      const drug = drugs.find((d) => d.id === selectedDrug);
 
       // Send email via API
       const response = await fetch('/api/send-campaign-email', {
@@ -310,11 +310,11 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
         body: JSON.stringify({
           html: htmlContent,
           subject: processTemplate(finalSubject),
-          deviceName: device?.name || '',
+          deviceName: drug?.name || '',
           campaignType,
           targetHCPs: hcpTags.join(', '),
           senderName: salesRep?.name || 'Sales Representative',
-          senderEmail: salesRep?.email || 'sales@medicaldevices.com',
+          senderEmail: salesRep?.email || 'sales@pharmaceutical.com',
         }),
       });
 
@@ -333,8 +333,8 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
       setTimeout(() => {
         const campaign: Campaign = {
           id: `camp_${Date.now()}`,
-          deviceId: selectedDevice,
-          deviceName: device?.name || '',
+          drugId: selectedDrug,
+          drugName: drug?.name || '',
           hcpTags,
           campaignType,
           subject: processTemplate(finalSubject),
@@ -351,7 +351,7 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
 
         // Reset form after delay
         setTimeout(() => {
-          setSelectedDevice('');
+          setSelectedDrug('');
           setHcpTags([]);
           setCampaignType('');
           setStreamedContent('');
@@ -398,21 +398,21 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
       </div>
 
       <div className="space-y-6">
-        {/* Device Selection */}
+        {/* Drug Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             <FileText className="w-4 h-4 inline mr-2" />
-            Select a device...
+            Select a drug...
           </label>
           <select
-            value={selectedDevice}
-            onChange={(e) => setSelectedDevice(e.target.value)}
+            value={selectedDrug}
+            onChange={(e) => setSelectedDrug(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           >
-            <option value="">Choose device...</option>
-            {devices.map((device) => (
-              <option key={device.id} value={device.id}>
-                {device.name}
+            <option value="">Choose drug...</option>
+            {drugs.map((drug) => (
+              <option key={drug.id} value={drug.id}>
+                {drug.name}
               </option>
             ))}
           </select>
@@ -518,7 +518,7 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
         {/* Quick Launch Button */}
         <Button
           onClick={handleQuickLaunch}
-          disabled={!selectedDevice || hcpTags.length === 0 || !campaignType}
+          disabled={!selectedDrug || hcpTags.length === 0 || !campaignType}
           className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white"
         >
           <Sparkles className="w-4 h-4 mr-2" />
@@ -568,7 +568,7 @@ export function SmartCampaignBuilder({ devices, onCampaignLaunched }: SmartCampa
                     Generating Your Campaign Email
                   </h4>
                   <p className="text-gray-600">
-                    Our AI is analyzing your device data and creating a personalized email for{' '}
+                    Our AI is analyzing your drug data and creating a personalized email for{' '}
                     {hcpTags.join(', ')}...
                   </p>
                 </div>

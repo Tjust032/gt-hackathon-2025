@@ -21,9 +21,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     },
     {
       icon: Users,
-      label: 'My Devices',
-      href: '/dashboard/devices',
-      active: pathname === '/dashboard/devices',
+      label: 'My Medications',
+      href: '/dashboard/medications',
+      active: pathname === '/dashboard/medications',
     },
     {
       icon: Database,

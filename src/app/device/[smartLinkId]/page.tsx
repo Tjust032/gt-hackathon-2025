@@ -1,6 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getDeviceBySmartLink } from '@/lib/mockData';
+import { getDrugBySmartLink } from '@/lib/mockData';
 import { DevicePageClient } from './DevicePageClient';
 
 interface DevicePageProps {
@@ -11,12 +11,12 @@ interface DevicePageProps {
 
 export default async function DevicePage({ params }: DevicePageProps) {
   const { smartLinkId } = await params;
-  const device = getDeviceBySmartLink(smartLinkId);
+  const drug = getDrugBySmartLink(smartLinkId);
 
-  if (!device) {
-    console.error('Device not found for smartLinkId:', smartLinkId);
+  if (!drug) {
+    console.error('Drug not found for smartLinkId:', smartLinkId);
     notFound();
   }
 
-  return <DevicePageClient device={device} />;
+  return <DevicePageClient device={drug} />;
 }

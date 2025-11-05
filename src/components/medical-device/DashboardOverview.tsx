@@ -18,13 +18,13 @@ import {
 import Link from 'next/link';
 
 import { Button } from '@/cedar/components/ui/button';
-import { MedicalDevice } from '@/lib/mockData';
+import { PrescriptionDrug } from '@/lib/mockData';
 
 interface Campaign {
   id: string;
   name: string;
   status: 'active' | 'scheduled' | 'completed' | 'draft';
-  deviceId: string;
+  drugId: string;
   startDate: string;
   endDate: string;
   targetHCPs: number;
@@ -41,13 +41,13 @@ interface HCPContact {
   hospital: string;
   lastActivity: string;
   activityType: 'viewed' | 'downloaded' | 'scheduled' | 'contacted';
-  deviceInterest?: string;
+  drugInterest?: string;
 }
 
 interface DashboardMetrics {
   activeHCPContacts: number;
   campaignEngagement: number;
-  devicePortfolio: number;
+  drugPortfolio: number;
   monthlyOutreach: number;
   responseRate: number;
   activeCampaignsCount: number;
@@ -60,7 +60,7 @@ interface DashboardOverviewProps {
   metrics: DashboardMetrics;
   campaigns: Campaign[];
   hcpContacts: HCPContact[];
-  devices: MedicalDevice[];
+  drugs: PrescriptionDrug[];
   timeFilter: '7d' | '30d' | '90d';
   onTimeFilterChange: (filter: '7d' | '30d' | '90d') => void;
 }
@@ -69,7 +69,7 @@ export function DashboardOverview({
   metrics,
   campaigns,
   hcpContacts,
-  devices,
+  drugs,
   timeFilter,
   onTimeFilterChange,
 }: DashboardOverviewProps) {
@@ -114,8 +114,8 @@ export function DashboardOverview({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Medical Device Campaign Center</h1>
-          <p className="text-gray-600 mt-1">Manage your device campaigns and HCP relationships</p>
+          <h1 className="text-2xl font-bold text-gray-900">Pharmaceutical Campaign Center</h1>
+          <p className="text-gray-600 mt-1">Manage your drug campaigns and HCP relationships</p>
         </div>
         <div className="flex items-center gap-4">
           {/* Time Filter */}
@@ -187,10 +187,10 @@ export function DashboardOverview({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-400 uppercase tracking-wider">
-                DEVICE PORTFOLIO
+                DRUG PORTFOLIO
               </p>
-              <p className="text-3xl font-bold text-white mt-2">{metrics.devicePortfolio}</p>
-              <p className="text-sm text-gray-400 mt-1">Devices</p>
+              <p className="text-3xl font-bold text-white mt-2">{metrics.drugPortfolio}</p>
+              <p className="text-sm text-gray-400 mt-1">Drugs</p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="w-4 h-4 text-emerald-400 mr-1" />
                 <span className="text-emerald-400 font-medium text-sm">1 new this month</span>
@@ -267,13 +267,13 @@ export function DashboardOverview({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select a device...
+                Select a drug...
               </label>
               <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
-                <option value="">Choose device...</option>
-                {devices.map((device) => (
-                  <option key={device.id} value={device.id}>
-                    {device.name}
+                <option value="">Choose drug...</option>
+                {drugs.map((drug) => (
+                  <option key={drug.id} value={drug.id}>
+                    {drug.name}
                   </option>
                 ))}
               </select>
@@ -341,9 +341,9 @@ export function DashboardOverview({
                   <p className="text-sm text-gray-600">
                     {contact.activityType === 'viewed' && 'viewed'}
                     {contact.activityType === 'downloaded' && 'downloaded clinical trial PDF.'}
-                    {contact.activityType === 'scheduled' && 'scheduled a demo meeting.'}
+                    {contact.activityType === 'scheduled' && 'scheduled a meeting.'}
                     {contact.activityType === 'contacted' && 'sent inquiry about'}
-                    {contact.deviceInterest && ` ${contact.deviceInterest} device page.`}
+                    {contact.drugInterest && ` ${contact.drugInterest} drug page.`}
                   </p>
                   <p className="text-xs text-gray-500">{contact.hospital}</p>
                 </div>
@@ -364,9 +364,9 @@ export function DashboardOverview({
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-gray-900">Top Performing Device</p>
+                  <p className="font-semibold text-gray-900">Top Performing Drug</p>
                   <p className="text-gray-600 mt-0.5">
-                    CardioMax Stent{' '}
+                    Repatha{' '}
                     <span className="font-semibold text-gray-900">(+25% engagement)</span>
                   </p>
                 </div>

@@ -14,10 +14,10 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 
-import { MedicalDevice, MedicalCategory, mockSalesRep } from '@/lib/mockData';
+import { PrescriptionDrug, TherapeuticCategory, mockSalesRep } from '@/lib/mockData';
 
 interface PublicDevicePageProps {
-  device: MedicalDevice;
+  device: PrescriptionDrug;
   onSectionView: (section: string) => void;
 }
 

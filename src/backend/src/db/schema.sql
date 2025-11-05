@@ -1,13 +1,23 @@
--- PostgreSQL schema for medical device documents with BioBERT embeddings
+-- PostgreSQL schema for prescription drug documents with BioBERT embeddings
 
 -- Enable pgvector extension for vector storage
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "vector";
 
--- Listings table to track device/medicine postings with auto-incrementing ID
+-- Listings table to track prescription drug postings with auto-incrementing ID
 CREATE TABLE IF NOT EXISTS listings (
     listing_id SERIAL PRIMARY KEY,
-    device_name VARCHAR(500),
+    drug_name VARCHAR(500),
+    generic_name VARCHAR(500),
+    manufacturer VARCHAR(500),
+    ndc_code VARCHAR(20),
+    dosage_form VARCHAR(100),
+    strength VARCHAR(100),
+    route_of_administration VARCHAR(100),
+    active_ingredient VARCHAR(500),
+    therapeutic_class VARCHAR(200),
+    prescription_required BOOLEAN DEFAULT true,
+    controlled_substance_schedule VARCHAR(10),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

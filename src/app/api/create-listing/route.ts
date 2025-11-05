@@ -7,15 +7,42 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { deviceName } = body;
+    const {
+      drugName,
+      genericName,
+      manufacturer,
+      ndcCode,
+      dosageForm,
+      strength,
+      routeOfAdministration,
+      activeIngredient,
+      therapeuticClass,
+      prescriptionRequired,
+      controlledSubstanceSchedule,
+    } = body;
 
-    if (!deviceName) {
-      return NextResponse.json({ error: 'Device name is required' }, { status: 400 });
+    if (!drugName || !genericName || !manufacturer || !ndcCode) {
+      return NextResponse.json(
+        { error: 'Drug name, generic name, manufacturer, and NDC code are required' },
+        { status: 400 },
+      );
     }
 
     // In production, use the database service
     // const { dbService } = await import('@/backend/src/db/database');
-    // const listingId = await dbService.createListing(deviceName);
+    // const listingId = await dbService.createListing({
+    //   drugName,
+    //   genericName,
+    //   manufacturer,
+    //   ndcCode,
+    //   dosageForm,
+    //   strength,
+    //   routeOfAdministration,
+    //   activeIngredient,
+    //   therapeuticClass,
+    //   prescriptionRequired: prescriptionRequired ?? true,
+    //   controlledSubstanceSchedule,
+    // });
 
     // For now, simulate auto-increment (in production this comes from DB)
     // This would be handled by PostgreSQL SERIAL type

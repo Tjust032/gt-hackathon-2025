@@ -10,10 +10,10 @@ import {
 
 import { PublicDevicePage } from '@/components/medical-device/PublicDevicePage';
 import { FloatingCedarChat } from '@/cedar/components/chatComponents/FloatingCedarChat';
-import { mockClinicalChatResponses, MedicalDevice } from '@/lib/mockData';
+import { mockClinicalChatResponses, PrescriptionDrug } from '@/lib/mockData';
 
 interface DevicePageClientProps {
-  device: MedicalDevice;
+  device: PrescriptionDrug;
 }
 
 export function DevicePageClient({ device }: DevicePageClientProps) {
@@ -163,9 +163,9 @@ export function DevicePageClient({ device }: DevicePageClientProps) {
   // Subscribe states to Cedar context
   useSubscribeStateToAgentContext(
     'publicDevice',
-    (device: MedicalDevice) => ({
-      deviceName: device.name,
-      company: device.company,
+    (device: PrescriptionDrug) => ({
+      drugName: device.name,
+      manufacturer: device.manufacturer,
       categories: device.tags,
       clinicalFilesCount: device.clinicalFiles.length,
       hasImages: device.imageUrls.length > 0,
@@ -297,7 +297,7 @@ export function DevicePageClient({ device }: DevicePageClientProps) {
 }
 
 // Helper function to generate clinical responses
-function generateClinicalResponse(query: string, device: MedicalDevice): string {
+function generateClinicalResponse(query: string, device: PrescriptionDrug): string {
   const queryLower = query.toLowerCase();
 
   // Check for specific keywords in the query
@@ -363,7 +363,7 @@ function generateClinicalResponse(query: string, device: MedicalDevice): string 
 // Helper function to generate clinical responses using document context
 function generateClinicalResponseWithContext(
   query: string,
-  device: MedicalDevice,
+  device: PrescriptionDrug,
   documentContext: string,
 ): string {
   const queryLower = query.toLowerCase();

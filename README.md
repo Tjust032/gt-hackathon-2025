@@ -1,31 +1,31 @@
 # Medicus 🏥
 
-**AI-Powered Medical Device Sales Platform**
+**AI-Powered Prescription Drug Sales Platform**
 
-Medicus is a digital platform that revolutionizes how medical device sales reps connect with healthcare providers, delivering the right information to the right provider at the right time.
+Medicus is a digital platform that revolutionizes how pharmaceutical sales reps connect with healthcare providers, delivering the right information to the right provider at the right time.
 
 ![Built with](https://img.shields.io/badge/Built%20with-React%20%7C%20Next.js%20%7C%20TypeScript-blue)
 ![AI Powered](https://img.shields.io/badge/AI%20Powered-OpenAI%20%7C%20Mastra%20%7C%20Cedar-green)
-![Healthcare](https://img.shields.io/badge/Industry-Healthcare%20%7C%20Medical%20Devices-red)
+![Healthcare](https://img.shields.io/badge/Industry-Healthcare%20%7C%20Pharmaceuticals-red)
 
 ## 🌟 Inspiration
 
-We were inspired by the challenge of improving HCP (Healthcare Provider) engagement. Doctors are often overwhelmed by irrelevant information, while sales reps spend time and money traveling to hospitals without knowing if their visit will add value. We wanted to create a solution that is smarter, more efficient, and more equitable: one that delivers the right information, to the right provider, at the right time.
+We were inspired by the challenge of improving HCP (Healthcare Provider) engagement. Doctors are often overwhelmed by irrelevant information, while pharmaceutical sales reps spend time and money traveling to hospitals without knowing if their visit will add value. We wanted to create a solution that is smarter, more efficient, and more equitable: one that delivers the right information, to the right provider, at the right time.
 
 ## 🚀 What Medicus Does
 
-Medicus is a digital platform that allows medical device sales reps to upload their products, complete with clinical research, safety data, and use cases. Using an AI search engine, doctors can easily preview relevant information before a sales visit. This helps doctors get the right information at the right time, while sales reps save resources and focus their visits on the hospitals that will truly benefit.
+Medicus is a digital platform that allows pharmaceutical sales reps to upload prescription drugs, complete with clinical trial data, prescribing information, and therapeutic evidence. Using an AI search engine powered by BioBERT embeddings, doctors can easily preview relevant information before a sales visit. This helps doctors get the right information at the right time, while sales reps save resources and focus their visits on the hospitals that will truly benefit.
 
 ### Key Features
 
-- **📱 Smart Device Management**: Upload medical devices with clinical data, safety information, and use cases
+- **💊 Smart Drug Management**: Upload prescription drugs with clinical data, prescribing information, and therapeutic evidence
 - **🤖 AI-Powered Campaign Generation**: Generate personalized email campaigns using OpenAI
 - **📧 Intelligent Email Delivery**: Send targeted communications to healthcare providers
-- **📊 Analytics Dashboard**: Track campaign performance and device engagement
+- **📊 Analytics Dashboard**: Track campaign performance and drug engagement
 - **🔍 HCP Database**: Manage healthcare provider contacts and specialties
-- **📄 Clinical Research Integration**: Upload and manage PDFs, clinical trials, and research papers
-- **🎯 Smart Link Generation**: Create trackable device information pages
-- **💡 Real-time AI Assistance**: Cedar-OS powered chat for doctors to interact with the information.
+- **📄 Clinical Research Integration**: Upload and manage PDFs, Phase I/II/III trials, and prescribing information
+- **🎯 Smart Link Generation**: Create trackable drug information pages
+- **💡 Real-time AI Assistance**: Cedar-OS powered chat for doctors to interact with drug information and clinical evidence
 
 ## 🛠️ How We Built It
 
@@ -99,19 +99,19 @@ This runs both the Next.js frontend and Mastra backend concurrently:
 
 ## 🎯 Key Workflows
 
-### For Sales Representatives
+### For Pharmaceutical Sales Representatives
 
-1. **Device Registration**: Upload medical devices with clinical research and safety data
-2. **Campaign Creation**: Generate AI-powered, personalized email campaigns
+1. **Drug Registration**: Upload prescription drugs with clinical trial data, prescribing information, and therapeutic evidence
+2. **Campaign Creation**: Generate AI-powered, personalized email campaigns targeting specific therapeutic areas
 3. **HCP Targeting**: Select specific healthcare provider specialties and demographics
-4. **Performance Tracking**: Monitor email engagement and device interest
+4. **Performance Tracking**: Monitor email engagement and drug interest
 
 ### For Healthcare Providers
 
-1. **Device Discovery**: Browse and search medical devices relevant to their specialty
-2. **Clinical Review**: Access clinical research, safety data, and use cases
-3. **Smart Links**: Preview device information before sales meetings
-4. **Informed Decisions**: Make better-informed purchasing decisions
+1. **Drug Discovery**: Browse and search prescription drugs relevant to their specialty and patient population
+2. **Clinical Review**: Access Phase I/II/III trial data, prescribing information, and FDA approval documentation
+3. **Smart Links**: Preview drug information and clinical evidence before sales meetings
+4. **Informed Decisions**: Make better-informed prescribing decisions based on comprehensive evidence
 
 ## 🚧 Challenges We Overcame
 
@@ -133,10 +133,10 @@ The healthcare system is quite complex, and navigating it to create an effective
 
 We see countless possibilities for Medicus:
 
-- **🏢 Enterprise Partnerships**: Pitch to med-tech companies like Medtronic or J&J
-- **📈 Advanced Analytics**: Implement predictive analytics for sales optimization
+- **🏢 Enterprise Partnerships**: Pitch to pharmaceutical companies like Amgen, Bristol Myers Squibb, Johnson & Johnson, and Incyte
+- **📈 Advanced Analytics**: Implement predictive analytics for sales optimization and prescribing pattern analysis
 - **🌐 Global Expansion**: Scale to international healthcare markets
-- **🔒 Enhanced Security**: Implement advanced healthcare data protection
+- **🔒 Enhanced Security**: Implement advanced healthcare data protection and HIPAA compliance
 - **📱 Mobile Apps**: Native mobile applications for on-the-go access
 
 ## 🏗️ Project Architecture

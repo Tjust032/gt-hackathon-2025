@@ -6,14 +6,14 @@ import { SmartCampaignBuilder } from '@/components/medical-device/SmartCampaignB
 import { CampaignManager } from '@/components/medical-device/CampaignManager';
 import { SidePanelCedarChat } from '@/cedar/components/chatComponents/SidePanelCedarChat';
 import { DebuggerPanel } from '@/cedar/components/debugger';
-import { mockDevices } from '@/lib/mockData';
+import { mockDrugs } from '@/lib/mockData';
 import { Plus, Target, Sparkles, BarChart3 } from 'lucide-react';
 import { Button } from '@/cedar/components/ui/button';
 
 interface Campaign {
   id: string;
-  deviceId: string;
-  deviceName: string;
+  drugId: string;
+  drugName: string;
   hcpTags: string[];
   campaignType: string;
   subject: string;
@@ -31,11 +31,11 @@ export default function CampaignsPage() {
     // Mock campaigns for demonstration
     {
       id: 'camp_1',
-      deviceId: 'device1',
-      deviceName: 'CardioTech Pro Dual Chamber Pacemaker',
+      drugId: 'drug1',
+      drugName: 'Repatha',
       hcpTags: ['Interventional Cardiologist', 'Chief of Cardiology'],
       campaignType: 'awareness',
-      subject: 'Introducing CardioTech Pro - Revolutionary Advancement for Memorial Healthcare',
+      subject: 'Introducing Repatha - Revolutionary LDL-C Reduction for Memorial Healthcare',
       content: 'Dear Dr. Johnson,\n\nI hope this message finds you well...',
       variables: { hospital_name: 'Memorial Healthcare', doctor_name: 'Johnson' },
       status: 'responded',
@@ -45,12 +45,12 @@ export default function CampaignsPage() {
     },
     {
       id: 'camp_2',
-      deviceId: 'device1',
-      deviceName: 'CardioTech Pro Dual Chamber Pacemaker',
-      hcpTags: ['Cardiac Surgeon', 'Electrophysiologist'],
+      drugId: 'drug2',
+      drugName: 'Opdivo',
+      hcpTags: ['Oncologist', 'Medical Oncology'],
       campaignType: 'education',
-      subject: 'Clinical Evidence Update: CardioTech Pro Outcomes at University Hospital',
-      content: 'Dear Dr. Mitchell,\n\nAs a respected Cardiac Surgeon...',
+      subject: 'Clinical Evidence Update: Opdivo Outcomes at University Hospital',
+      content: 'Dear Dr. Mitchell,\n\nAs a respected Oncologist...',
       variables: { hospital_name: 'University Hospital', doctor_name: 'Mitchell' },
       status: 'opened',
       createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
@@ -59,11 +59,11 @@ export default function CampaignsPage() {
     },
     {
       id: 'camp_3',
-      deviceId: 'device1',
-      deviceName: 'CardioTech Pro Dual Chamber Pacemaker',
+      drugId: 'drug3',
+      drugName: 'Xarelto',
       hcpTags: ['Emergency Medicine', 'Cardiologist'],
       campaignType: 'follow-up',
-      subject: 'Follow-up: CardioTech Pro Implementation at City Medical Center',
+      subject: 'Follow-up: Xarelto Implementation at City Medical Center',
       content: 'Dear Dr. Rodriguez,\n\nFollowing up on our recent discussion...',
       variables: { hospital_name: 'City Medical Center', doctor_name: 'Rodriguez' },
       status: 'delivered',
@@ -85,7 +85,7 @@ export default function CampaignsPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Campaign Management</h1>
             <p className="text-gray-600 mt-1">
-              Create and manage your medical device marketing campaigns
+              Create and manage your prescription drug marketing campaigns
             </p>
           </div>
           <Button className="bg-cyan-600 hover:bg-cyan-700 text-white">
@@ -135,7 +135,7 @@ export default function CampaignsPage() {
 
         {/* Tab Content */}
         {activeTab === 'create' && (
-          <SmartCampaignBuilder devices={mockDevices} onCampaignLaunched={handleCampaignLaunched} />
+          <SmartCampaignBuilder drugs={mockDrugs} onCampaignLaunched={handleCampaignLaunched} />
         )}
 
         {activeTab === 'manage' && (

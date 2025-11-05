@@ -14,23 +14,23 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-import { MedicalDevice, MedicalCategory, medicalCategories } from '@/lib/mockData';
+import { PrescriptionDrug, TherapeuticCategory, therapeuticCategories } from '@/lib/mockData';
 import { DeviceCard } from './DeviceCard';
 import { Button } from '@/cedar/components/ui/button';
 import { Dropdown } from './Dropdown';
 
 interface DeviceManagementProps {
-  devices: MedicalDevice[];
+  drugs: PrescriptionDrug[];
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  selectedCategories: MedicalCategory[];
-  onCategoryChange: (categories: MedicalCategory[]) => void;
+  selectedCategories: TherapeuticCategory[];
+  onCategoryChange: (categories: TherapeuticCategory[]) => void;
   viewMode: 'grid' | 'list';
   onViewModeChange: (mode: 'grid' | 'list') => void;
 }
 
 export function DeviceManagement({
-  devices,
+  drugs,
   searchQuery,
   onSearchChange,
   selectedCategories,
@@ -38,7 +38,7 @@ export function DeviceManagement({
   viewMode,
   onViewModeChange,
 }: DeviceManagementProps) {
-  const handleCategoryToggle = (category: MedicalCategory) => {
+  const handleCategoryToggle = (category: TherapeuticCategory) => {
     if (selectedCategories.includes(category)) {
       onCategoryChange(selectedCategories.filter((c) => c !== category));
     } else {
@@ -46,18 +46,19 @@ export function DeviceManagement({
     }
   };
 
-  const categoryColors: Record<MedicalCategory, string> = {
-    'Heart/Cardiovascular': 'bg-red-100 text-red-800 border-red-200',
-    'Brain/Neurological': 'bg-purple-100 text-purple-800 border-purple-200',
-    'Cancer/Oncology': 'bg-orange-100 text-orange-800 border-orange-200',
-    Orthopedic: 'bg-blue-100 text-blue-800 border-blue-200',
-    Respiratory: 'bg-green-100 text-green-800 border-green-200',
-    Gastrointestinal: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  const categoryColors: Record<TherapeuticCategory, string> = {
+    Cardiovascular: 'bg-red-100 text-red-800 border-red-200',
+    Oncology: 'bg-purple-100 text-purple-800 border-purple-200',
+    Hematology: 'bg-orange-100 text-orange-800 border-orange-200',
+    'Rare Disease': 'bg-blue-100 text-blue-800 border-blue-200',
+    Immunotherapy: 'bg-green-100 text-green-800 border-green-200',
+    Biologics: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    'Small Molecule': 'bg-indigo-100 text-indigo-800 border-indigo-200',
     Custom: 'bg-gray-100 text-gray-800 border-gray-200',
   };
 
-  const handleGenerateSmartLink = async (device: MedicalDevice) => {
-    const link = `${window.location.origin}/device/${device.smartLinkId}`;
+  const handleGenerateSmartLink = async (drug: PrescriptionDrug) => {
+    const link = `${window.location.origin}/device/${drug.smartLinkId}`;
     try {
       await navigator.clipboard.writeText(link);
       alert('Smart link copied to clipboard!');
@@ -71,16 +72,16 @@ export function DeviceManagement({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Devices</h1>
+          <h1 className="text-2xl font-bold text-gray-900">My Drugs</h1>
           <p className="text-gray-600 mt-1">
-            Manage your medical device portfolio and create smart links for HCP engagement
+            Manage your prescription drug portfolio and create smart links for HCP engagement
           </p>
         </div>
         <div className="flex gap-3">
-          <Link href="/dashboard/devices/add">
+          <Link href="/dashboard/medications/add">
             <Button className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-medium">
               <Plus className="w-5 h-5" />
-              Add New Device
+              Add New Drug
             </Button>
           </Link>
         </div>
@@ -92,9 +93,9 @@ export function DeviceManagement({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-400 uppercase tracking-wider">
-                TOTAL DEVICES
+                TOTAL DRUGS
               </p>
-              <p className="text-3xl font-bold text-white mt-2">{devices.length}</p>
+              <p className="text-3xl font-bold text-white mt-2">{drugs.length}</p>
             </div>
             <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
               <Grid className="w-6 h-6 text-gray-400" />
@@ -108,7 +109,7 @@ export function DeviceManagement({
                 CATEGORIES
               </p>
               <p className="text-3xl font-bold text-white mt-2">
-                {new Set(devices.flatMap((d) => d.tags)).size}
+                {new Set(drugs.flatMap((d) => d.tags)).size}
               </p>
             </div>
             <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
@@ -122,7 +123,7 @@ export function DeviceManagement({
               <p className="text-sm font-medium text-gray-400 uppercase tracking-wider">
                 SMART LINKS
               </p>
-              <p className="text-3xl font-bold text-white mt-2">{devices.length}</p>
+              <p className="text-3xl font-bold text-white mt-2">{drugs.length}</p>
             </div>
             <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
               <ExternalLink className="w-6 h-6 text-gray-400" />
@@ -136,7 +137,7 @@ export function DeviceManagement({
                 CLINICAL FILES
               </p>
               <p className="text-3xl font-bold text-white mt-2">
-                {devices.reduce((sum, device) => sum + device.clinicalFiles.length, 0)}
+                {drugs.reduce((sum, drug) => sum + drug.clinicalFiles.length, 0)}
               </p>
             </div>
             <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
@@ -154,7 +155,7 @@ export function DeviceManagement({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search devices, companies, or descriptions..."
+                placeholder="Search drugs, manufacturers, or descriptions..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -179,7 +180,7 @@ export function DeviceManagement({
             >
               <div className="p-4 space-y-2 min-w-[250px]">
                 <h3 className="font-medium text-gray-900 mb-3">Filter by Category</h3>
-                {medicalCategories.map((category) => (
+                {therapeuticCategories.map((category) => (
                   <label key={category} className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
@@ -253,13 +254,13 @@ export function DeviceManagement({
         )}
       </div>
 
-      {/* Devices Section */}
+      {/* Drugs Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold text-gray-900">
-                Medical Devices ({devices.length})
+                Prescription Drugs ({drugs.length})
               </h2>
               {searchQuery && (
                 <p className="text-sm text-gray-600 mt-1">
@@ -280,22 +281,22 @@ export function DeviceManagement({
           </div>
         </div>
 
-        {devices.length === 0 ? (
+        {drugs.length === 0 ? (
           <div className="p-12 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Grid className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No devices found</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No drugs found</h3>
             <p className="text-gray-600 mb-6">
               {searchQuery || selectedCategories.length > 0
                 ? 'Try adjusting your search or filters'
-                : 'Get started by adding your first medical device'}
+                : 'Get started by adding your first prescription drug'}
             </p>
             {!searchQuery && selectedCategories.length === 0 && (
-              <Link href="/dashboard/devices/add">
+              <Link href="/dashboard/medications/add">
                 <Button className="bg-cyan-600 hover:bg-cyan-700 text-white">
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Device
+                  Add Drug
                 </Button>
               </Link>
             )}
@@ -309,27 +310,29 @@ export function DeviceManagement({
                   : 'space-y-4'
               }
             >
-              {devices.map((device) => (
-                <div key={device.id} className="relative">
-                  <DeviceCard device={device} viewMode={viewMode} categoryColors={categoryColors} />
-                  {/* Smart Link Actions */}
-                  <div className="absolute top-2 right-2 flex gap-1">
-                    <button
-                      onClick={() => handleGenerateSmartLink(device)}
-                      className="p-2 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-lg shadow-sm border border-gray-200 transition-all"
-                      title="Copy Smart Link"
-                    >
-                      <ExternalLink className="w-4 h-4 text-gray-600" />
-                    </button>
-                    <Link
-                      href={`/device/${device.smartLinkId}`}
-                      target="_blank"
-                      className="p-2 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-lg shadow-sm border border-gray-200 transition-all"
-                      title="Preview Device Page"
-                    >
-                      <Share2 className="w-4 h-4 text-gray-600" />
-                    </Link>
-                  </div>
+              {drugs.map((drug) => (
+                <div key={drug.id} className="relative">
+                  <DeviceCard device={drug} viewMode={viewMode} categoryColors={categoryColors} />
+                  {/* Smart Link Actions - Only show in grid view */}
+                  {viewMode === 'grid' && (
+                    <div className="absolute top-2 right-2 flex gap-1">
+                      <button
+                        onClick={() => handleGenerateSmartLink(drug)}
+                        className="p-2 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-lg shadow-sm border border-gray-200 transition-all"
+                        title="Copy Smart Link"
+                      >
+                        <ExternalLink className="w-4 h-4 text-gray-600" />
+                      </button>
+                      <Link
+                        href={`/device/${drug.smartLinkId}`}
+                        target="_blank"
+                        className="p-2 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-lg shadow-sm border border-gray-200 transition-all"
+                        title="Preview Drug Page"
+                      >
+                        <Share2 className="w-4 h-4 text-gray-600" />
+                      </Link>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

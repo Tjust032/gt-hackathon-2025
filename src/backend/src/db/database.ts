@@ -24,23 +24,63 @@ export interface DocumentRecord {
 
 export interface ListingRecord {
   listing_id: number; // Auto-incrementing SERIAL
-  device_name: string;
+  drug_name: string;
+  generic_name: string;
+  manufacturer: string;
+  ndc_code: string;
+  dosage_form: string;
+  strength: string;
+  route_of_administration: string;
+  active_ingredient: string;
+  therapeutic_class: string;
+  prescription_required: boolean;
+  controlled_substance_schedule?: string;
   created_at: Date;
   updated_at: Date;
+}
+
+export interface DrugData {
+  drugName: string;
+  genericName: string;
+  manufacturer: string;
+  ndcCode: string;
+  dosageForm: string;
+  strength: string;
+  routeOfAdministration: string;
+  activeIngredient: string;
+  therapeuticClass: string;
+  prescriptionRequired: boolean;
+  controlledSubstanceSchedule?: string;
 }
 
 export class DatabaseService {
   /**
    * Create a new listing and return the auto-generated ID
    */
-  async createListing(deviceName: string): Promise<number> {
+  async createListing(drugData: DrugData): Promise<number> {
     const query = `
-      INSERT INTO listings (device_name)
-      VALUES ($1)
+      INSERT INTO listings (
+        drug_name, generic_name, manufacturer, ndc_code, dosage_form,
+        strength, route_of_administration, active_ingredient,
+        therapeutic_class, prescription_required, controlled_substance_schedule
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING listing_id
     `;
 
-    const result = await pool.query(query, [deviceName]);
+    const result = await pool.query(query, [
+      drugData.drugName,
+      drugData.genericName,
+      drugData.manufacturer,
+      drugData.ndcCode,
+      drugData.dosageForm,
+      drugData.strength,
+      drugData.routeOfAdministration,
+      drugData.activeIngredient,
+      drugData.therapeuticClass,
+      drugData.prescriptionRequired,
+      drugData.controlledSubstanceSchedule || null,
+    ]);
     return result.rows[0].listing_id;
   }
 

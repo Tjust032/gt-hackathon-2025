@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { mockDevices, mockSalesRep } from '@/lib/mockData';
+import { mockDrugs, mockSalesRep } from '@/lib/mockData';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -9,40 +9,48 @@ const openai = new OpenAI({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { deviceId, hcpTags, campaignType } = body;
+    const { drugId, hcpTags, campaignType } = body;
 
-    // Find the device
-    const device = mockDevices.find((d) => d.id === deviceId);
-    if (!device) {
-      return NextResponse.json({ error: 'Device not found' }, { status: 404 });
+    // Find the drug
+    const drug = mockDrugs.find((d) => d.id === drugId);
+    if (!drug) {
+      return NextResponse.json({ error: 'Drug not found' }, { status: 404 });
     }
 
-    // Compile device information
-    const deviceInfo = {
-      name: device.name,
-      company: device.company,
-      description: device.description,
-      smartLinkUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/device/${device.smartLinkId}`,
-      clinicalEvidence: device.clinicalFiles.map((file) => ({
+    // Compile drug information
+    const drugInfo = {
+      name: drug.name,
+      genericName: drug.genericName,
+      manufacturer: drug.manufacturer,
+      description: drug.description,
+      smartLinkUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/device/${drug.smartLinkId}`,
+      clinicalEvidence: drug.clinicalFiles.map((file) => ({
         title: file.filename,
         description: file.description,
         content: file.extractedContent?.substring(0, 500) + '...', // Truncate for prompt
       })),
-      tags: device.tags,
+      tags: drug.tags,
+      therapeuticClass: drug.therapeuticClass,
+      dosageForm: drug.dosageForm,
+      strength: drug.strength,
     };
 
     // Create the prompt for structured email generation
-    const prompt = `You are an expert medical device sales representative creating a professional email campaign. Generate a structured email template based on the following information:
+    const prompt = `You are an expert pharmaceutical sales representative creating a professional email campaign. Generate a structured email template based on the following information:
 
-**Device Information:**
-- Name: ${deviceInfo.name}
-- Company: ${deviceInfo.company}
-- Description: ${deviceInfo.description}
-- Categories: ${deviceInfo.tags.join(', ')}
-- Device Information Link: ${deviceInfo.smartLinkUrl}
+**Prescription Drug Information:**
+- Brand Name: ${drugInfo.name}
+- Generic Name: ${drugInfo.genericName}
+- Manufacturer: ${drugInfo.manufacturer}
+- Description: ${drugInfo.description}
+- Therapeutic Class: ${drugInfo.therapeuticClass}
+- Dosage Form: ${drugInfo.dosageForm}
+- Strength: ${drugInfo.strength}
+- Categories: ${drugInfo.tags.join(', ')}
+- Drug Information Link: ${drugInfo.smartLinkUrl}
 
 **Clinical Evidence:**
-${deviceInfo.clinicalEvidence
+${drugInfo.clinicalEvidence
   .map(
     (evidence) =>
       `- ${evidence.title}: ${evidence.description}\n  Key findings: ${evidence.content}`,
@@ -80,13 +88,13 @@ Generate a JSON response with the following structure:
       "content": "Key clinical findings and benefits"
     }
   ],
-  "deviceBenefits": [
+  "drugBenefits": [
     "Benefit 1 with specific data",
     "Benefit 2 with clinical outcomes",
-    "Benefit 3 with operational advantages"
+    "Benefit 3 with therapeutic advantages"
   ],
   "callToAction": "Clear next steps and call to action",
-  "deviceLink": "${deviceInfo.smartLinkUrl}",
+  "drugLink": "${drugInfo.smartLinkUrl}",
   "signature": "Professional closing and signature"
 }
 
@@ -95,9 +103,9 @@ Requirements:
 - Match ${campaignType} campaign strategy
 - Include actual clinical data points from the evidence
 - Use template variables naturally: {doctor_name}, {hospital_name}, {specialty_focus}
-- Maintain professional medical sales tone
+- Maintain professional pharmaceutical sales tone
 - Include compelling call-to-action
-- Reference the device link naturally in context
+- Reference the drug link naturally in context
 - Use the sales rep information in the signature: ${mockSalesRep.name}, ${mockSalesRep.email}, ${mockSalesRep.phone}, ${mockSalesRep.territory}
 
 Return ONLY the JSON object, no other text.`;
@@ -109,7 +117,7 @@ Return ONLY the JSON object, no other text.`;
         {
           role: 'system',
           content:
-            "You are an expert medical device sales representative. Generate professional, personalized email campaigns that convert prospects into customers. Always return valid JSON with 'subject' and 'content' fields.",
+            "You are an expert pharmaceutical sales representative. Generate professional, personalized email campaigns that convert prospects into customers. Always return valid JSON with 'subject' and 'content' fields.",
         },
         {
           role: 'user',
@@ -148,7 +156,7 @@ Return ONLY the JSON object, no other text.`;
       'greeting',
       'opening',
       'clinicalEvidence',
-      'deviceBenefits',
+      'drugBenefits',
       'callToAction',
       'signature',
     ];
@@ -176,7 +184,7 @@ ${emailData.clinicalEvidence
   .join('\n\n')}
 
 **Key Benefits:**
-${emailData.deviceBenefits.map((benefit: string) => `• ${benefit}`).join('\n')}
+${emailData.drugBenefits.map((benefit: string) => `• ${benefit}`).join('\n')}
 
 ${emailData.callToAction}
 
@@ -189,14 +197,15 @@ ${emailData.signature}`;
         subject: emailData.subject,
         content: plainTextContent, // Backward compatibility
         structuredData: emailData, // New structured format
-        deviceId,
+        drugId,
         campaignType,
         targetHCPs: hcpTags.join(', '),
         createdAt: new Date().toISOString(),
-        deviceInfo: {
-          name: device.name,
-          company: device.company,
-          smartLinkUrl: deviceInfo.smartLinkUrl,
+        drugInfo: {
+          name: drug.name,
+          genericName: drug.genericName,
+          manufacturer: drug.manufacturer,
+          smartLinkUrl: drugInfo.smartLinkUrl,
         },
         salesRep: {
           name: mockSalesRep.name,

@@ -1,29 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDeviceById } from '@/lib/mockData';
+import { getDrugById } from '@/lib/mockData';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { deviceId, campaignType, targetHCPs, tone, emailLength, additionalContext } = body;
+    const { drugId, campaignType, targetHCPs, tone, emailLength, additionalContext } = body;
 
     // Validate required fields
-    if (!deviceId || !campaignType || !targetHCPs) {
+    if (!drugId || !campaignType || !targetHCPs) {
       return NextResponse.json(
-        { error: 'Missing required fields: deviceId, campaignType, and targetHCPs are required' },
+        { error: 'Missing required fields: drugId, campaignType, and targetHCPs are required' },
         { status: 400 },
       );
     }
 
-    // Get device information
-    const device = getDeviceById(deviceId);
-    if (!device) {
-      return NextResponse.json({ error: 'Device not found' }, { status: 404 });
+    // Get drug information
+    const drug = getDrugById(drugId);
+    if (!drug) {
+      return NextResponse.json({ error: 'Drug not found' }, { status: 404 });
     }
 
     // Generate campaign email using AI (simulated for now)
-    const subject = generateSubject(device.name, campaignType, targetHCPs);
+    const subject = generateSubject(drug.name, campaignType, targetHCPs);
     const content = generateEmailContent({
-      device,
+      drug,
       campaignType,
       targetHCPs,
       tone,
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       id: `email_${Date.now()}`,
       subject,
       content,
-      deviceId,
+      drugId,
       campaignType,
       targetHCPs,
       tone,
@@ -52,29 +52,29 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function generateSubject(deviceName: string, campaignType: string, targetHCPs: string): string {
+function generateSubject(drugName: string, campaignType: string, targetHCPs: string): string {
   const subjectTemplates = {
-    awareness: `Introducing ${deviceName}: Revolutionary Technology for ${targetHCPs}`,
-    'product-launch': `Now Available: ${deviceName} - Advanced Solutions for ${targetHCPs}`,
-    educational: `Clinical Evidence Update: ${deviceName} Outcomes for ${targetHCPs}`,
-    'follow-up': `Following Up: ${deviceName} Implementation for ${targetHCPs}`,
+    awareness: `Introducing ${drugName}: Breakthrough Therapy for ${targetHCPs}`,
+    'product-launch': `Now Available: ${drugName} - Advanced Treatment for ${targetHCPs}`,
+    educational: `Clinical Evidence Update: ${drugName} Outcomes for ${targetHCPs}`,
+    'follow-up': `Following Up: ${drugName} Implementation for ${targetHCPs}`,
   };
 
   return (
     subjectTemplates[campaignType as keyof typeof subjectTemplates] ||
-    `${deviceName} - Important Update for ${targetHCPs}`
+    `${drugName} - Important Update for ${targetHCPs}`
   );
 }
 
 function generateEmailContent({
-  device,
+  drug,
   campaignType,
   targetHCPs,
   tone,
   emailLength,
   additionalContext,
 }: {
-  device: any;
+  drug: any;
   campaignType: string;
   targetHCPs: string;
   tone: string;
@@ -83,17 +83,17 @@ function generateEmailContent({
 }): string {
   const greeting = getGreeting(tone);
   const clinicalData =
-    device.clinicalFiles?.[0]?.extractedContent || 'outstanding clinical outcomes';
-  const deviceSpecs = getDeviceHighlights(device, emailLength);
+    drug.clinicalFiles?.[0]?.extractedContent || 'outstanding clinical outcomes';
+  const drugSpecs = getDrugHighlights(drug, emailLength);
   const callToAction = getCallToAction(campaignType, tone);
 
   const content = `${greeting} ${targetHCPs},
 
-I hope this message finds you well. I'm reaching out to share ${getCampaignOpening(campaignType)} about the ${device.name}.
+I hope this message finds you well. I'm reaching out to share ${getCampaignOpening(campaignType)} about ${drug.name}.
 
-${getMainContent(campaignType, device, clinicalData, emailLength)}
+${getMainContent(campaignType, drug, clinicalData, emailLength)}
 
-${deviceSpecs}
+${drugSpecs}
 
 ${additionalContext ? `\nAdditional Information:\n${additionalContext}\n` : ''}
 
@@ -101,9 +101,9 @@ ${callToAction}
 
 Best regards,
 [Your Name]
-Medical Device Specialist
+Pharmaceutical Sales Specialist
 
-${getPostScript(device, campaignType)}`;
+${getPostScript(drug, campaignType)}`;
 
   return content.trim();
 }
@@ -130,7 +130,7 @@ function getCampaignOpening(campaignType: string): string {
 
 function getMainContent(
   campaignType: string,
-  device: any,
+  drug: any,
   clinicalData: string,
   emailLength: string,
 ): string {
@@ -140,13 +140,13 @@ function getMainContent(
   let content = '';
 
   if (campaignType === 'awareness') {
-    content = `The ${device.name} represents a significant advancement in medical technology, offering enhanced patient outcomes and streamlined clinical workflows.`;
+    content = `${drug.name} represents a significant advancement in pharmaceutical therapy, offering enhanced patient outcomes and improved quality of life.`;
   } else if (campaignType === 'product-launch') {
-    content = `We're excited to announce the availability of the ${device.name}, our latest innovation designed specifically for your clinical needs.`;
+    content = `We're excited to announce the availability of ${drug.name}, our latest breakthrough therapy designed specifically for your patients' needs.`;
   } else if (campaignType === 'educational') {
-    content = `Recent clinical studies have demonstrated exceptional outcomes with the ${device.name}.`;
+    content = `Recent clinical studies have demonstrated exceptional outcomes with ${drug.name}.`;
   } else {
-    content = `Following our previous discussion about the ${device.name}, I wanted to provide you with additional insights.`;
+    content = `Following our previous discussion about ${drug.name}, I wanted to provide you with additional insights.`;
   }
 
   if (isStandard || isDetailed) {
@@ -159,26 +159,26 @@ function getMainContent(
       content += `
 • Comprehensive clinical trial data available
 • Post-market surveillance confirming safety
-• Cost-effective solution for your practice`;
+• Patient assistance programs available`;
     }
   }
 
   return content;
 }
 
-function getDeviceHighlights(device: any, emailLength: string): string {
+function getDrugHighlights(drug: any, emailLength: string): string {
   const isDetailed = emailLength === 'detailed';
 
-  let highlights = `Why ${device.name} Matters for Your Practice:`;
+  let highlights = `Why ${drug.name} Matters for Your Practice:`;
 
   if (isDetailed) {
-    highlights += `\n• Advanced technology with proven clinical outcomes
-• Streamlined workflow integration
-• Comprehensive support and training
-• Competitive pricing and reimbursement support`;
+    highlights += `\n• Proven clinical efficacy with strong trial data
+• Simple dosing and administration
+• Comprehensive prescriber support
+• Patient assistance and reimbursement support`;
   } else {
-    highlights += `\n• Proven clinical outcomes
-• Easy integration into your workflow`;
+    highlights += `\n• Proven clinical efficacy
+• Straightforward patient management`;
   }
 
   return highlights;
@@ -198,10 +198,10 @@ function getCallToAction(campaignType: string, tone: string): string {
     : 'I would be delighted to arrange a demonstration or provide additional clinical data. Would you be interested in learning more?';
 }
 
-function getPostScript(device: any, campaignType: string): string {
+function getPostScript(drug: any, campaignType: string): string {
   if (campaignType === 'educational') {
-    return `P.S. I have additional peer-reviewed studies and case reports available that demonstrate the effectiveness of ${device.name} in clinical practice.`;
+    return `P.S. I have additional peer-reviewed studies and case reports available that demonstrate the effectiveness of ${drug.name} in clinical practice.`;
   }
 
-  return `P.S. I have comprehensive clinical data and testimonials from colleagues who are already using ${device.name} successfully.`;
+  return `P.S. I have comprehensive clinical data and testimonials from colleagues who are already prescribing ${drug.name} successfully.`;
 }

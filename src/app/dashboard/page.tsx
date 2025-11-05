@@ -12,14 +12,14 @@ import { DashboardLayout } from '@/components/medical-device/DashboardLayout';
 import { DashboardOverview } from '@/components/medical-device/DashboardOverview';
 import { SidePanelCedarChat } from '@/cedar/components/chatComponents/SidePanelCedarChat';
 import { DebuggerPanel } from '@/cedar/components/debugger';
-import { mockDevices, mockSalesRep, MedicalDevice } from '@/lib/mockData';
+import { mockDrugs, mockSalesRep, PrescriptionDrug } from '@/lib/mockData';
 
 // Mock data for dashboard
 interface Campaign {
   id: string;
   name: string;
   status: 'active' | 'scheduled' | 'completed' | 'draft';
-  deviceId: string;
+  drugId: string;
   startDate: string;
   endDate: string;
   targetHCPs: number;
@@ -36,15 +36,15 @@ interface HCPContact {
   hospital: string;
   lastActivity: string;
   activityType: 'viewed' | 'downloaded' | 'scheduled' | 'contacted';
-  deviceInterest?: string;
+  drugInterest?: string;
 }
 
 const mockCampaigns: Campaign[] = [
   {
     id: 'camp1',
-    name: 'CardioTech Pro Q4 Launch',
+    name: 'Repatha Q4 Launch',
     status: 'active',
-    deviceId: 'device1',
+    drugId: 'drug1',
     startDate: '2024-10-01',
     endDate: '2024-12-31',
     targetHCPs: 150,
@@ -54,9 +54,9 @@ const mockCampaigns: Campaign[] = [
   },
   {
     id: 'camp2',
-    name: 'NeuroStim Awareness',
+    name: 'Opdivo Awareness',
     status: 'active',
-    deviceId: 'device2',
+    drugId: 'drug2',
     startDate: '2024-11-01',
     endDate: '2025-01-31',
     targetHCPs: 85,
@@ -66,9 +66,9 @@ const mockCampaigns: Campaign[] = [
   },
   {
     id: 'camp3',
-    name: 'OrthoFlex Spring Campaign',
+    name: 'Xarelto Spring Campaign',
     status: 'scheduled',
-    deviceId: 'device3',
+    drugId: 'drug3',
     startDate: '2025-03-01',
     endDate: '2025-05-31',
     targetHCPs: 200,
@@ -87,7 +87,7 @@ const mockHCPContacts: HCPContact[] = [
     hospital: 'Mayo Clinic',
     lastActivity: '2 min ago',
     activityType: 'viewed',
-    deviceInterest: 'CardioMax',
+    drugInterest: 'Repatha',
   },
   {
     id: 'hcp2',
@@ -125,7 +125,7 @@ export default function DashboardPage() {
     return {
       activeHCPContacts: 247,
       campaignEngagement: avgEngagement,
-      devicePortfolio: mockDevices.length,
+      drugPortfolio: mockDrugs.length,
       monthlyOutreach: totalMeetings * 12, // Extrapolated
       responseRate: 12,
       activeCampaignsCount: activeCampaigns.length,
@@ -155,7 +155,7 @@ export default function DashboardPage() {
         description: 'Create a new marketing campaign',
         argsSchema: z.object({
           name: z.string().describe('Campaign name'),
-          deviceId: z.string().describe('Target device ID'),
+          drugId: z.string().describe('Target drug ID'),
           targetHCPs: z.number().describe('Number of HCPs to target'),
           startDate: z.string().describe('Campaign start date'),
           endDate: z.string().describe('Campaign end date'),
@@ -165,7 +165,7 @@ export default function DashboardPage() {
           setValue: (newValue: Campaign[]) => void,
           args: {
             name: string;
-            deviceId: string;
+            drugId: string;
             targetHCPs: number;
             startDate: string;
             endDate: string;
@@ -175,7 +175,7 @@ export default function DashboardPage() {
             id: `camp_${Date.now()}`,
             name: args.name,
             status: 'draft',
-            deviceId: args.deviceId,
+            drugId: args.drugId,
             startDate: args.startDate,
             endDate: args.endDate,
             targetHCPs: args.targetHCPs,
@@ -212,7 +212,7 @@ export default function DashboardPage() {
     (metrics: typeof dashboardMetrics) => ({
       activeHCPs: metrics.activeHCPContacts,
       engagement: metrics.campaignEngagement,
-      devices: metrics.devicePortfolio,
+      drugs: metrics.drugPortfolio,
       activeCampaigns: metrics.activeCampaignsCount,
       performance: metrics.responseRate > 10 ? 'good' : 'needs_improvement',
     }),
@@ -290,7 +290,7 @@ export default function DashboardPage() {
         metrics={dashboardMetrics}
         campaigns={campaigns}
         hcpContacts={hcpContacts}
-        devices={mockDevices}
+        drugs={mockDrugs}
         timeFilter={timeFilter}
         onTimeFilterChange={setTimeFilter}
       />
