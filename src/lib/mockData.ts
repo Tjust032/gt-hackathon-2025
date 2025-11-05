@@ -125,7 +125,12 @@ export const mockDrugs: PrescriptionDrug[] = [
     description:
       'A fully human monoclonal antibody that inhibits PCSK9 (proprotein convertase subtilisin/kexin type 9) to lower LDL cholesterol. Indicated for adults with atherosclerotic cardiovascular disease or familial hypercholesterolemia who require additional lowering of LDL-C.',
     manufacturerProductUrl: 'https://www.repatha.com/',
-    imageUrls: ['/pacemaker1.webp', '/pacemaker2.webp', '/pacemaker3.webp', '/pacemaker4.jpg'],
+    imageUrls: [
+      'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=800&auto=format&fit=crop',
+    ],
     tags: ['Cardiovascular', 'Biologics'],
     clinicalFiles: mockClinicalFiles,
     smartLinkId: 'repatha-evolocumab-abc123',
@@ -148,7 +153,12 @@ export const mockDrugs: PrescriptionDrug[] = [
     description:
       'A programmed death receptor-1 (PD-1) blocking antibody indicated for the treatment of multiple types of cancer including melanoma, non-small cell lung cancer, renal cell carcinoma, and others. Works by enhancing T-cell immune responses against tumor cells.',
     manufacturerProductUrl: 'https://www.opdivo.com/',
-    imageUrls: ['/pacemaker1.webp', '/pacemaker2.webp', '/pacemaker3.webp', '/pacemaker4.jpg'],
+    imageUrls: [
+      'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=800&auto=format&fit=crop',
+    ],
     tags: ['Oncology', 'Immunotherapy', 'Biologics'],
     clinicalFiles: [],
     smartLinkId: 'opdivo-nivolumab-def456',
@@ -171,7 +181,12 @@ export const mockDrugs: PrescriptionDrug[] = [
     description:
       'A Factor Xa inhibitor anticoagulant indicated for reducing the risk of stroke and systemic embolism in patients with nonvalvular atrial fibrillation, treatment and prevention of deep vein thrombosis (DVT) and pulmonary embolism (PE).',
     manufacturerProductUrl: 'https://www.xarelto.com/',
-    imageUrls: ['/pacemaker1.webp', '/pacemaker2.webp', '/pacemaker3.webp', '/pacemaker4.jpg'],
+    imageUrls: [
+      'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&auto=format&fit=crop',
+    ],
     tags: ['Cardiovascular', 'Hematology', 'Small Molecule'],
     clinicalFiles: [],
     smartLinkId: 'xarelto-rivaroxaban-ghi789',
@@ -194,7 +209,12 @@ export const mockDrugs: PrescriptionDrug[] = [
     description:
       'A kinase inhibitor indicated for the treatment of adults with previously treated, unresectable locally advanced or metastatic cholangiocarcinoma with a fibroblast growth factor receptor 2 (FGFR2) fusion or other rearrangement.',
     manufacturerProductUrl: 'https://www.pemazyre.com/',
-    imageUrls: ['/pacemaker1.webp', '/pacemaker2.webp', '/pacemaker3.webp', '/pacemaker4.jpg'],
+    imageUrls: [
+      'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&auto=format&fit=crop',
+    ],
     tags: ['Oncology', 'Rare Disease', 'Small Molecule'],
     clinicalFiles: [],
     smartLinkId: 'pemazyre-pemigatinib-jkl012',
@@ -238,6 +258,21 @@ export const getDrugById = (id: string): PrescriptionDrug | undefined => {
 };
 
 export const getDrugBySmartLink = (smartLinkId: string): PrescriptionDrug | undefined => {
+  // Try to get drugs from localStorage first (for newly added drugs)
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('drugs');
+      if (stored) {
+        const drugs = JSON.parse(stored) as PrescriptionDrug[];
+        const drug = drugs.find((d) => d.smartLinkId === smartLinkId);
+        if (drug) return drug;
+      }
+    } catch (e) {
+      console.error('Failed to read drugs from localStorage:', e);
+    }
+  }
+
+  // Fallback to mockDrugs
   return mockDrugs.find((drug) => drug.smartLinkId === smartLinkId);
 };
 

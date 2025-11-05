@@ -80,6 +80,21 @@ export default function DrugsPage() {
     }
   }, [drugs]);
 
+  // Handle drug deletion
+  const handleDeleteDrug = (drugId: string) => {
+    const updatedDrugs = drugs.filter((drug) => drug.id !== drugId);
+    setDrugs(updatedDrugs);
+    localStorage.setItem('drugs', JSON.stringify(updatedDrugs));
+  };
+
+  // Reset drugs to original mock data
+  const handleResetDrugs = () => {
+    if (confirm('Are you sure you want to reset to the original mock drugs? This will remove all custom drugs you added.')) {
+      setDrugs(mockDrugs);
+      localStorage.setItem('drugs', JSON.stringify(mockDrugs));
+    }
+  };
+
   // Register Cedar state for drug management
   useRegisterState({
     key: 'drugs',
@@ -148,12 +163,29 @@ export default function DrugsPage() {
         ) => {
           const drug = currentDrugs.find((d) => d.id === args.drugId);
           if (drug) {
-            const link = `${window.location.origin}/device/${drug.smartLinkId}`;
+            const link = `${window.location.origin}/medication/${drug.smartLinkId}`;
             navigator.clipboard.writeText(link);
             console.log(`Smart link copied to clipboard: ${link}`);
           } else {
             console.log('Drug not found');
           }
+        },
+      },
+      deleteDrug: {
+        name: 'deleteDrug',
+        description: 'Delete a drug from the portfolio',
+        argsSchema: z.object({
+          drugId: z.string().describe('Drug ID to delete'),
+        }),
+        execute: (
+          currentDrugs: PrescriptionDrug[],
+          setValue: (newValue: PrescriptionDrug[]) => void,
+          args: { drugId: string },
+        ) => {
+          const updatedDrugs = currentDrugs.filter((d) => d.id !== args.drugId);
+          setValue(updatedDrugs);
+          localStorage.setItem('drugs', JSON.stringify(updatedDrugs));
+          console.log(`Drug deleted: ${args.drugId}`);
         },
       },
     },
@@ -219,6 +251,8 @@ export default function DrugsPage() {
         onCategoryChange={setSelectedCategories}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        onDeleteDrug={handleDeleteDrug}
+        onResetDrugs={handleResetDrugs}
       />
     </DashboardLayout>
   );

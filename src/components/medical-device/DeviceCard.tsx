@@ -12,11 +12,12 @@ interface DeviceCardProps {
   device: PrescriptionDrug;
   viewMode: 'grid' | 'list';
   categoryColors: Record<TherapeuticCategory, string>;
+  onDelete?: (deviceId: string) => void;
 }
 
-export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps) {
+export function DeviceCard({ device, viewMode, categoryColors, onDelete }: DeviceCardProps) {
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/device/${device.smartLinkId}`;
+    const shareUrl = `${window.location.origin}/medication/${device.smartLinkId}`;
 
     if (navigator.share) {
       try {
@@ -38,8 +39,11 @@ export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete ${device.name}?`)) {
-      // This would trigger the Cedar agent's deleteDrug action
-      console.log('Deleting drug:', device.id);
+      if (onDelete) {
+        onDelete(device.id);
+      } else {
+        console.log('No delete handler provided');
+      }
     }
   };
 
@@ -82,7 +86,7 @@ export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">
                       <Link
-                        href={`/device/${device.smartLinkId}`}
+                        href={`/medication/${device.smartLinkId}`}
                         className="hover:text-gray-600 transition-colors"
                       >
                         {device.name}
@@ -179,7 +183,7 @@ export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps
           <div className="flex-grow min-w-0">
             <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
               <Link
-                href={`/device/${device.smartLinkId}`}
+                href={`/medication/${device.smartLinkId}`}
                 className="hover:text-gray-600 transition-colors"
               >
                 {device.name}

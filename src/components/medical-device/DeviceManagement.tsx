@@ -27,6 +27,8 @@ interface DeviceManagementProps {
   onCategoryChange: (categories: TherapeuticCategory[]) => void;
   viewMode: 'grid' | 'list';
   onViewModeChange: (mode: 'grid' | 'list') => void;
+  onDeleteDrug?: (drugId: string) => void;
+  onResetDrugs?: () => void;
 }
 
 export function DeviceManagement({
@@ -37,6 +39,8 @@ export function DeviceManagement({
   onCategoryChange,
   viewMode,
   onViewModeChange,
+  onDeleteDrug,
+  onResetDrugs,
 }: DeviceManagementProps) {
   const handleCategoryToggle = (category: TherapeuticCategory) => {
     if (selectedCategories.includes(category)) {
@@ -58,7 +62,7 @@ export function DeviceManagement({
   };
 
   const handleGenerateSmartLink = async (drug: PrescriptionDrug) => {
-    const link = `${window.location.origin}/device/${drug.smartLinkId}`;
+    const link = `${window.location.origin}/medication/${drug.smartLinkId}`;
     try {
       await navigator.clipboard.writeText(link);
       alert('Smart link copied to clipboard!');
@@ -72,7 +76,7 @@ export function DeviceManagement({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Drugs</h1>
+          <h1 className="text-2xl font-bold text-gray-900">My Medications</h1>
           <p className="text-gray-600 mt-1">
             Manage your prescription drug portfolio and create smart links for HCP engagement
           </p>
@@ -277,6 +281,16 @@ export function DeviceManagement({
                 <Share2 className="w-4 h-4" />
                 Bulk Share
               </Button>
+              {onResetDrugs && (
+                <Button
+                  variant="outline"
+                  onClick={onResetDrugs}
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                  title="Reset to original mock drugs"
+                >
+                  Reset Data
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -312,7 +326,12 @@ export function DeviceManagement({
             >
               {drugs.map((drug) => (
                 <div key={drug.id} className="relative">
-                  <DeviceCard device={drug} viewMode={viewMode} categoryColors={categoryColors} />
+                  <DeviceCard
+                    device={drug}
+                    viewMode={viewMode}
+                    categoryColors={categoryColors}
+                    onDelete={onDeleteDrug}
+                  />
                   {/* Smart Link Actions - Only show in grid view */}
                   {viewMode === 'grid' && (
                     <div className="absolute top-2 right-2 flex gap-1">
@@ -324,7 +343,7 @@ export function DeviceManagement({
                         <ExternalLink className="w-4 h-4 text-gray-600" />
                       </button>
                       <Link
-                        href={`/device/${drug.smartLinkId}`}
+                        href={`/medication/${drug.smartLinkId}`}
                         target="_blank"
                         className="p-2 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-lg shadow-sm border border-gray-200 transition-all"
                         title="Preview Drug Page"

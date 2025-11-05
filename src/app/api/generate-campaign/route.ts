@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       genericName: drug.genericName,
       manufacturer: drug.manufacturer,
       description: drug.description,
-      smartLinkUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/device/${drug.smartLinkId}`,
+      smartLinkUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/medication/${drug.smartLinkId}`,
       clinicalEvidence: drug.clinicalFiles.map((file) => ({
         title: file.filename,
         description: file.description,
