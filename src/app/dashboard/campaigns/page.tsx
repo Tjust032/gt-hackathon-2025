@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/medical-device/DashboardLayout';
 import { SmartCampaignBuilder } from '@/components/medical-device/SmartCampaignBuilder';
 import { CampaignManager } from '@/components/medical-device/CampaignManager';
-import { SidePanelCedarChat } from '@/cedar/components/chatComponents/SidePanelCedarChat';
-import { DebuggerPanel } from '@/cedar/components/debugger';
+import { FloatingCedarChat } from '@/cedar/components/chatComponents/FloatingCedarChat';
 import { mockDrugs } from '@/lib/mockData';
 import { Plus, Target, Sparkles, BarChart3 } from 'lucide-react';
 import { Button } from '@/cedar/components/ui/button';
@@ -197,14 +196,9 @@ export default function CampaignsPage() {
   );
 
   return (
-    <SidePanelCedarChat
-      side="right"
-      title="Campaign Assistant"
-      collapsedLabel="AI Assistant"
-      showCollapsedButton={true}
-    >
-      <DebuggerPanel />
+    <>
+      <FloatingCedarChat />
       {renderContent()}
-    </SidePanelCedarChat>
+    </>
   );
 }

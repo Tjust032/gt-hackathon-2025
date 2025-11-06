@@ -10,8 +10,7 @@ import {
 
 import { DashboardLayout } from '@/components/medical-device/DashboardLayout';
 import { DrugRegistrationForm } from '@/components/medical-device/DrugRegistrationForm';
-import { SidePanelCedarChat } from '@/cedar/components/chatComponents/SidePanelCedarChat';
-import { DebuggerPanel } from '@/cedar/components/debugger';
+import { FloatingCedarChat } from '@/cedar/components/chatComponents/FloatingCedarChat';
 import { TherapeuticCategory } from '@/lib/mockData';
 
 interface DrugFormData {
@@ -187,14 +186,9 @@ export default function AddDrugPage() {
   );
 
   return (
-    <SidePanelCedarChat
-      side="right"
-      title="Drug Registration Assistant"
-      collapsedLabel="Chat with AI"
-      showCollapsedButton={true}
-    >
-      <DebuggerPanel />
+    <>
+      <FloatingCedarChat />
       {renderContent()}
-    </SidePanelCedarChat>
+    </>
   );
 }

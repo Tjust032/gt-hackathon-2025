@@ -10,8 +10,7 @@ import {
 
 import { DashboardLayout } from '@/components/medical-device/DashboardLayout';
 import { HCPDatabase } from '@/components/medical-device/HCPDatabase';
-import { SidePanelCedarChat } from '@/cedar/components/chatComponents/SidePanelCedarChat';
-import { DebuggerPanel } from '@/cedar/components/debugger';
+import { FloatingCedarChat } from '@/cedar/components/chatComponents/FloatingCedarChat';
 
 interface HCPContact {
   id: string;
@@ -312,14 +311,9 @@ export default function HCPDatabasePage() {
   );
 
   return (
-    <SidePanelCedarChat
-      side="right"
-      title="HCP Assistant"
-      collapsedLabel="Chat with AI"
-      showCollapsedButton={true}
-    >
-      <DebuggerPanel />
+    <>
+      <FloatingCedarChat />
       {renderContent()}
-    </SidePanelCedarChat>
+    </>
   );
 }

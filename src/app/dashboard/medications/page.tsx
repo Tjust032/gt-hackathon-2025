@@ -10,8 +10,7 @@ import {
 
 import { DashboardLayout } from '@/components/medical-device/DashboardLayout';
 import { DeviceManagement } from '@/components/medical-device/DeviceManagement';
-import { SidePanelCedarChat } from '@/cedar/components/chatComponents/SidePanelCedarChat';
-import { DebuggerPanel } from '@/cedar/components/debugger';
+import { FloatingCedarChat } from '@/cedar/components/chatComponents/FloatingCedarChat';
 import { mockDrugs, PrescriptionDrug, TherapeuticCategory, searchDrugs } from '@/lib/mockData';
 
 export default function DrugsPage() {
@@ -65,9 +64,7 @@ export default function DrugsPage() {
     }
 
     if (selectedCategories.length > 0) {
-      result = result.filter((drug) =>
-        drug.tags.some((tag) => selectedCategories.includes(tag)),
-      );
+      result = result.filter((drug) => drug.tags.some((tag) => selectedCategories.includes(tag)));
     }
 
     return result;
@@ -89,7 +86,11 @@ export default function DrugsPage() {
 
   // Reset drugs to original mock data
   const handleResetDrugs = () => {
-    if (confirm('Are you sure you want to reset to the original mock drugs? This will remove all custom drugs you added.')) {
+    if (
+      confirm(
+        'Are you sure you want to reset to the original mock drugs? This will remove all custom drugs you added.',
+      )
+    ) {
       setDrugs(mockDrugs);
       localStorage.setItem('drugs', JSON.stringify(mockDrugs));
     }
@@ -241,6 +242,71 @@ export default function DrugsPage() {
     },
   });
 
+  useRegisterFrontendTool({
+    name: 'addMedication',
+    description:
+      'Add a new medication with comprehensive information including images, clinical data, and therapeutic details',
+    argsSchema: z.object({
+      medicationName: z
+        .string()
+        .describe('Name of the medication (e.g., Tylenol, Aspirin, Lisinopril)'),
+      genericName: z.string().optional().describe('Generic name if different from brand name'),
+      dosage: z.string().optional().describe('Dosage information (e.g., 500mg, 10mg/ml)'),
+      manufacturer: z.string().optional().describe('Manufacturer name'),
+      therapeuticClass: z
+        .string()
+        .optional()
+        .describe('Therapeutic class (e.g., Analgesic, Antibiotic)'),
+      includeImage: z.boolean().default(true).describe('Fetch medication images'),
+      includeClinicalData: z.boolean().default(true).describe('Fetch clinical trial information'),
+      additionalNotes: z.string().optional().describe('Additional notes or requirements'),
+    }),
+    execute: async (args: {
+      medicationName: string;
+      genericName?: string;
+      dosage?: string;
+      manufacturer?: string;
+      therapeuticClass?: string;
+      includeImage?: boolean;
+      includeClinicalData?: boolean;
+      additionalNotes?: string;
+    }) => {
+      try {
+        // Call the medication lookup and addition API
+        const response = await fetch('/api/add-medication', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(args),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to add medication: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success && result.medication) {
+          // Add the new medication to the local state
+          const newMedication: PrescriptionDrug = result.medication;
+          setDrugs((prevDrugs) => [...prevDrugs, newMedication]);
+
+          // Update localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('drugs', JSON.stringify([...drugs, newMedication]));
+          }
+
+          console.log(`Successfully added medication: ${newMedication.name}`);
+        } else {
+          console.error('Failed to add medication:', result.error || 'Unknown error');
+        }
+      } catch (error) {
+        console.error('Error adding medication:', error);
+      }
+    },
+  });
+
   const renderContent = () => (
     <DashboardLayout>
       <DeviceManagement
@@ -258,14 +324,9 @@ export default function DrugsPage() {
   );
 
   return (
-    <SidePanelCedarChat
-      side="right"
-      title="Drug Assistant"
-      collapsedLabel="Chat with AI"
-      showCollapsedButton={true}
-    >
-      <DebuggerPanel />
+    <>
+      <FloatingCedarChat />
       {renderContent()}
-    </SidePanelCedarChat>
+    </>
   );
 }

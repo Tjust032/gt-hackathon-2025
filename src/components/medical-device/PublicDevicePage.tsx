@@ -14,7 +14,8 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 
-import { PrescriptionDrug, TherapeuticCategory, mockSalesRep } from '@/lib/mockData';
+import { PrescriptionDrug, mockSalesRep } from '@/lib/mockData';
+import { getCategoryColor } from '@/lib/tagColors';
 
 interface PublicDevicePageProps {
   device: PrescriptionDrug;
@@ -23,16 +24,6 @@ interface PublicDevicePageProps {
 
 export function PublicDevicePage({ device, onSectionView }: PublicDevicePageProps) {
   const sectionRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
-
-  const categoryColors: Record<MedicalCategory, string> = {
-    'Heart/Cardiovascular': 'bg-red-100 text-red-800 border-red-200',
-    'Brain/Neurological': 'bg-purple-100 text-purple-800 border-purple-200',
-    'Cancer/Oncology': 'bg-orange-100 text-orange-800 border-orange-200',
-    Orthopedic: 'bg-blue-100 text-blue-800 border-blue-200',
-    Respiratory: 'bg-green-100 text-green-800 border-green-200',
-    Gastrointestinal: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    Custom: 'bg-gray-100 text-gray-800 border-gray-200',
-  };
 
   // Track section views with Intersection Observer
   React.useEffect(() => {
@@ -155,14 +146,14 @@ export function PublicDevicePage({ device, onSectionView }: PublicDevicePageProp
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">{device.name}</h1>
                 <div className="flex items-center gap-2 text-lg text-gray-600 mb-4">
                   <Building2 className="w-5 h-5" />
-                  {device.company}
+                  {device.manufacturer}
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-6">
                   {device.tags.map((tag) => (
                     <span
                       key={tag}
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${categoryColors[tag]}`}
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(tag)}`}
                     >
                       {tag}
                     </span>
@@ -174,7 +165,7 @@ export function PublicDevicePage({ device, onSectionView }: PublicDevicePageProp
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
-                  href={device.companyProductUrl}
+                  href={device.manufacturerProductUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-xl hover:bg-gray-800 transition-all duration-200 font-semibold text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"

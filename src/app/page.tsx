@@ -11,10 +11,8 @@ import {
 import { ChatModeSelector } from '@/components/ChatModeSelector';
 import { CedarCaptionChat } from '@/cedar/components/chatComponents/CedarCaptionChat';
 import { FloatingCedarChat } from '@/cedar/components/chatComponents/FloatingCedarChat';
-import { SidePanelCedarChat } from '@/cedar/components/chatComponents/SidePanelCedarChat';
-import { DebuggerPanel } from '@/cedar/components/debugger';
 
-type ChatMode = 'floating' | 'sidepanel' | 'caption';
+type ChatMode = 'floating' | 'caption';
 
 export default function HomePage() {
   // Redirect to dashboard for medical device campaign center
@@ -23,8 +21,8 @@ export default function HomePage() {
   }, []);
 
   // Cedar-OS chat components with mode selector
-  // Choose between caption, floating, or side panel chat modes
-  const [chatMode, setChatMode] = React.useState<ChatMode>('sidepanel');
+  // Choose between caption or floating chat modes
+  const [chatMode, setChatMode] = React.useState<ChatMode>('floating');
 
   // Cedar state for the main text that can be changed by the agent
   const [mainText, setMainText] = React.useState('tell Cedar to change me');
@@ -143,20 +141,6 @@ export default function HomePage() {
       )}
     </div>
   );
-
-  if (chatMode === 'sidepanel') {
-    return (
-      <SidePanelCedarChat
-        side="right"
-        title="Cedarling Chat"
-        collapsedLabel="Chat with Cedar"
-        showCollapsedButton={true}
-      >
-        <DebuggerPanel />
-        {renderContent()}
-      </SidePanelCedarChat>
-    );
-  }
 
   return renderContent();
 }

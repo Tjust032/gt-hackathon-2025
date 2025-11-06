@@ -10,9 +10,8 @@ import {
 
 import { DashboardLayout } from '@/components/medical-device/DashboardLayout';
 import { DashboardOverview } from '@/components/medical-device/DashboardOverview';
-import { SidePanelCedarChat } from '@/cedar/components/chatComponents/SidePanelCedarChat';
-import { DebuggerPanel } from '@/cedar/components/debugger';
-import { mockDrugs, mockSalesRep, PrescriptionDrug } from '@/lib/mockData';
+import { FloatingCedarChat } from '@/cedar/components/chatComponents/FloatingCedarChat';
+import { mockDrugs } from '@/lib/mockData';
 
 // Mock data for dashboard
 interface Campaign {
@@ -111,14 +110,11 @@ const mockHCPContacts: HCPContact[] = [
 
 export default function DashboardPage() {
   const [campaigns, setCampaigns] = React.useState<Campaign[]>(mockCampaigns);
-  const [hcpContacts, setHcpContacts] = React.useState<HCPContact[]>(mockHCPContacts);
   const [timeFilter, setTimeFilter] = React.useState<'7d' | '30d' | '90d'>('30d');
 
   // Calculate dashboard metrics
   const dashboardMetrics = React.useMemo(() => {
     const activeCampaigns = campaigns.filter((c) => c.status === 'active');
-    const totalHCPs = campaigns.reduce((sum, c) => sum + c.targetHCPs, 0);
-    const totalClicks = campaigns.reduce((sum, c) => sum + c.clicks, 0);
     const avgEngagement = campaigns.reduce((sum, c) => sum + c.engagement, 0) / campaigns.length;
     const totalMeetings = campaigns.reduce((sum, c) => sum + c.meetings, 0);
 
@@ -289,7 +285,7 @@ export default function DashboardPage() {
       <DashboardOverview
         metrics={dashboardMetrics}
         campaigns={campaigns}
-        hcpContacts={hcpContacts}
+        hcpContacts={mockHCPContacts}
         drugs={mockDrugs}
         timeFilter={timeFilter}
         onTimeFilterChange={setTimeFilter}
@@ -298,14 +294,9 @@ export default function DashboardPage() {
   );
 
   return (
-    <SidePanelCedarChat
-      side="right"
-      title="Campaign Assistant"
-      collapsedLabel="Chat with AI"
-      showCollapsedButton={true}
-    >
-      <DebuggerPanel />
+    <>
+      <FloatingCedarChat />
       {renderContent()}
-    </SidePanelCedarChat>
+    </>
   );
 }
