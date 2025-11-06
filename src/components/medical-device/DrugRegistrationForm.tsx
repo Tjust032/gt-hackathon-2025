@@ -15,6 +15,7 @@ import Link from 'next/link';
 
 import { TherapeuticCategory, therapeuticCategories } from '@/lib/mockData';
 import { Button } from '@/cedar/components/ui/button';
+import { categoryColors } from '@/lib/tagColors';
 
 interface DrugFormData {
   name: string;
@@ -54,17 +55,6 @@ export function DrugRegistrationForm({
   const [showUrlInput, setShowUrlInput] = React.useState(false);
   const [urlInput, setUrlInput] = React.useState('');
   const [urlDescription, setUrlDescription] = React.useState('');
-
-  const categoryColors: Record<TherapeuticCategory, string> = {
-    Cardiovascular: 'bg-red-100 text-red-800 border-red-200',
-    Oncology: 'bg-purple-100 text-purple-800 border-purple-200',
-    Hematology: 'bg-orange-100 text-orange-800 border-orange-200',
-    'Rare Disease': 'bg-blue-100 text-blue-800 border-blue-200',
-    Immunotherapy: 'bg-green-100 text-green-800 border-green-200',
-    Biologics: 'bg-teal-100 text-teal-800 border-teal-200',
-    'Small Molecule': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-    Custom: 'bg-gray-100 text-gray-800 border-gray-200',
-  };
 
   const dosageForms = [
     'Tablet',
@@ -162,7 +152,9 @@ export function DrugRegistrationForm({
           </Link>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Add New Prescription Drug</h1>
-            <p className="text-gray-600 mt-1">Register a new prescription drug to your sales portfolio</p>
+            <p className="text-gray-600 mt-1">
+              Register a new prescription drug to your sales portfolio
+            </p>
           </div>
         </div>
       </div>
@@ -322,7 +314,9 @@ export function DrugRegistrationForm({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Route of Administration *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Route of Administration *
+              </label>
               <select
                 value={formData.routeOfAdministration}
                 onChange={(e) => updateField('routeOfAdministration', e.target.value)}
@@ -338,12 +332,16 @@ export function DrugRegistrationForm({
                 ))}
               </select>
               {validationErrors.routeOfAdministration && (
-                <p className="text-red-600 text-sm mt-1">{validationErrors.routeOfAdministration}</p>
+                <p className="text-red-600 text-sm mt-1">
+                  {validationErrors.routeOfAdministration}
+                </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Active Ingredient *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Active Ingredient *
+              </label>
               <input
                 type="text"
                 value={formData.activeIngredient}
@@ -359,7 +357,9 @@ export function DrugRegistrationForm({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Therapeutic Class *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Therapeutic Class *
+              </label>
               <input
                 type="text"
                 value={formData.therapeuticClass}
@@ -375,10 +375,14 @@ export function DrugRegistrationForm({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Controlled Substance Schedule</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Controlled Substance Schedule
+              </label>
               <select
                 value={formData.controlledSubstanceSchedule || ''}
-                onChange={(e) => updateField('controlledSubstanceSchedule', e.target.value || undefined)}
+                onChange={(e) =>
+                  updateField('controlledSubstanceSchedule', e.target.value || undefined)
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Not Controlled</option>

@@ -21,9 +21,11 @@ interface MedicalDeviceEmailTemplateProps {
     title: string;
     content: string;
   }>;
-  deviceBenefits: string[];
+  deviceBenefits?: string[]; // Made optional for backward compatibility
+  drugBenefits?: string[]; // Added for new API structure
   callToAction: string;
-  deviceLink: string;
+  deviceLink?: string; // Made optional
+  drugLink?: string; // Added for new API structure
   signature: string;
   deviceName: string;
   companyName: string;
@@ -43,8 +45,10 @@ export function MedicalDeviceEmailTemplate({
   opening,
   clinicalEvidence,
   deviceBenefits,
+  drugBenefits,
   callToAction,
   deviceLink,
+  drugLink,
   signature,
   companyName,
   variables,
@@ -57,6 +61,12 @@ export function MedicalDeviceEmailTemplate({
       return processed.replace(regex, value);
     }, text);
   };
+
+  // Handle both deviceBenefits and drugBenefits for backward compatibility
+  const benefits = drugBenefits || deviceBenefits || [];
+
+  // Handle both deviceLink and drugLink for backward compatibility
+  const productLink = drugLink || deviceLink || '#';
 
   return (
     <Html>
@@ -78,28 +88,32 @@ export function MedicalDeviceEmailTemplate({
             <Text style={paragraph}>{processText(opening)}</Text>
 
             {/* Clinical Evidence */}
-            {clinicalEvidence.map((evidence, index) => (
-              <Section key={index} style={evidenceSection}>
-                <Heading style={evidenceTitle}>{evidence.title}</Heading>
-                <Text style={evidenceContent}>{processText(evidence.content)}</Text>
-              </Section>
-            ))}
-
-            {/* Device Benefits */}
-            <Section style={benefitsSection}>
-              <Heading style={sectionHeading}>Key Benefits</Heading>
-              {deviceBenefits.map((benefit, index) => (
-                <Text key={index} style={bulletPoint}>
-                  • {processText(benefit)}
-                </Text>
+            {clinicalEvidence &&
+              clinicalEvidence.length > 0 &&
+              clinicalEvidence.map((evidence, index) => (
+                <Section key={index} style={evidenceSection}>
+                  <Heading style={evidenceTitle}>{evidence.title}</Heading>
+                  <Text style={evidenceContent}>{processText(evidence.content)}</Text>
+                </Section>
               ))}
-            </Section>
+
+            {/* Benefits */}
+            {benefits.length > 0 && (
+              <Section style={benefitsSection}>
+                <Heading style={sectionHeading}>Key Benefits</Heading>
+                {benefits.map((benefit, index) => (
+                  <Text key={index} style={bulletPoint}>
+                    • {processText(benefit)}
+                  </Text>
+                ))}
+              </Section>
+            )}
 
             {/* Call to Action */}
             <Section style={ctaSection}>
               <Text style={paragraph}>{processText(callToAction)}</Text>
-              <Button style={button} href={deviceLink}>
-                Learn More About This Device
+              <Button style={button} href={productLink}>
+                Learn More About This Product
               </Button>
             </Section>
 

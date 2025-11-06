@@ -18,6 +18,7 @@ import { PrescriptionDrug, TherapeuticCategory, therapeuticCategories } from '@/
 import { DeviceCard } from './DeviceCard';
 import { Button } from '@/cedar/components/ui/button';
 import { Dropdown } from './Dropdown';
+import { categoryColors } from '@/lib/tagColors';
 
 interface DeviceManagementProps {
   drugs: PrescriptionDrug[];
@@ -50,23 +51,12 @@ export function DeviceManagement({
     }
   };
 
-  const categoryColors: Record<TherapeuticCategory, string> = {
-    Cardiovascular: 'bg-red-100 text-red-800 border-red-200',
-    Oncology: 'bg-purple-100 text-purple-800 border-purple-200',
-    Hematology: 'bg-orange-100 text-orange-800 border-orange-200',
-    'Rare Disease': 'bg-blue-100 text-blue-800 border-blue-200',
-    Immunotherapy: 'bg-green-100 text-green-800 border-green-200',
-    Biologics: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    'Small Molecule': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-    Custom: 'bg-gray-100 text-gray-800 border-gray-200',
-  };
-
   const handleGenerateSmartLink = async (drug: PrescriptionDrug) => {
     const link = `${window.location.origin}/medication/${drug.smartLinkId}`;
     try {
       await navigator.clipboard.writeText(link);
       alert('Smart link copied to clipboard!');
-    } catch (error) {
+    } catch {
       prompt('Copy this link:', link);
     }
   };

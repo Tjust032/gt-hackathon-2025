@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/cedar/components/ui/button';
+import { categoryColors } from '@/lib/tagColors';
 
 interface HCPContact {
   id: string;
@@ -300,7 +301,7 @@ export function HCPDatabase({
                             {hcp.deviceInterests.map((device, index) => (
                               <span
                                 key={index}
-                                className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-md"
+                                className="px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200 shadow-sm text-xs rounded-md font-medium"
                               >
                                 {device}
                               </span>
@@ -315,7 +316,9 @@ export function HCPDatabase({
                           {hcp.tags.map((tag, index) => (
                             <span
                               key={index}
-                              className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
+                              className={`px-2 py-1 text-xs rounded-md font-medium ${
+                                categoryColors[tag] || categoryColors.Custom
+                              }`}
                             >
                               {tag}
                             </span>
