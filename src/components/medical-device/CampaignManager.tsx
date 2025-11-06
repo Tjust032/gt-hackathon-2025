@@ -20,8 +20,8 @@ import {
 
 interface Campaign {
   id: string;
-  deviceId: string;
-  deviceName: string;
+  drugId: string;
+  drugName: string;
   hcpTags: string[];
   campaignType: string;
   subject: string;
@@ -128,7 +128,7 @@ export function CampaignManager({ campaigns, onViewAnalytics }: CampaignManagerP
 
   const filteredCampaigns = campaigns.filter((campaign) => {
     const matchesSearch =
-      campaign.deviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      campaign.drugName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       campaign.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
       campaign.hcpTags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -294,7 +294,7 @@ export function CampaignManager({ campaigns, onViewAnalytics }: CampaignManagerP
                         <Users className="w-3 h-3" />
                         {campaign.recipientCount || 0} recipients
                       </span>
-                      <span>Device: {campaign.deviceName}</span>
+                      <span>Drug: {campaign.drugName}</span>
                     </div>
 
                     <div className="flex flex-wrap gap-1">

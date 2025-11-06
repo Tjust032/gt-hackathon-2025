@@ -1,7 +1,7 @@
 import React from 'react';
-import { MessageCircle, PanelRight, Type } from 'lucide-react';
+import { MessageCircle, Type } from 'lucide-react';
 
-type ChatMode = 'floating' | 'sidepanel' | 'caption';
+type ChatMode = 'floating' | 'caption';
 
 interface ChatModeSelectorProps {
   currentMode: ChatMode;
@@ -21,12 +21,6 @@ export function ChatModeSelector({ currentMode, onModeChange }: ChatModeSelector
       label: 'Floating',
       icon: <MessageCircle className="w-4 h-4" />,
       description: 'Resizable floating chat window',
-    },
-    {
-      id: 'sidepanel' as const,
-      label: 'Side Panel',
-      icon: <PanelRight className="w-4 h-4" />,
-      description: 'Dedicated side panel layout',
     },
   ];
 

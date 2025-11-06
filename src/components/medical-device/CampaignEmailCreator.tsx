@@ -13,10 +13,10 @@ import {
   Edit3,
 } from 'lucide-react';
 import { Button } from '@/cedar/components/ui/button';
-import { MedicalDevice } from '@/lib/mockData';
+import { PrescriptionDrug } from '@/lib/mockData';
 
 interface CampaignEmailCreatorProps {
-  devices: MedicalDevice[];
+  drugs: PrescriptionDrug[];
   onEmailGenerated?: (email: GeneratedEmail) => void;
 }
 

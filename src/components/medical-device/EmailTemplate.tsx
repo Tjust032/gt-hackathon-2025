@@ -26,9 +26,11 @@ interface EmailTemplateProps {
       title: string;
       content: string;
     }>;
-    deviceBenefits: string[];
+    deviceBenefits?: string[];
+    drugBenefits?: string[];
     callToAction: string;
-    deviceLink: string;
+    deviceLink?: string;
+    drugLink?: string;
     signature: string;
   };
   salesRep?: {
@@ -59,8 +61,10 @@ export function EmailTemplate({
         opening={structuredData.opening}
         clinicalEvidence={structuredData.clinicalEvidence}
         deviceBenefits={structuredData.deviceBenefits}
+        drugBenefits={structuredData.drugBenefits}
         callToAction={structuredData.callToAction}
         deviceLink={structuredData.deviceLink}
+        drugLink={structuredData.drugLink}
         signature={structuredData.signature}
         deviceName={deviceName}
         companyName={companyName}

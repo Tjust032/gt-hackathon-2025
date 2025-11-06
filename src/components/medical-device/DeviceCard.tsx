@@ -5,41 +5,45 @@ import { Edit, Share2, Trash2, ExternalLink, FileText, Calendar, Building2 } fro
 import Link from 'next/link';
 import Image from 'next/image';
 
-import { MedicalDevice, MedicalCategory } from '@/lib/mockData';
+import { PrescriptionDrug, TherapeuticCategory } from '@/lib/mockData';
 import { Button } from '@/cedar/components/ui/button';
 
 interface DeviceCardProps {
-  device: MedicalDevice;
+  device: PrescriptionDrug;
   viewMode: 'grid' | 'list';
-  categoryColors: Record<MedicalCategory, string>;
+  categoryColors: Record<TherapeuticCategory, string>;
+  onDelete?: (deviceId: string) => void;
 }
 
-export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps) {
+export function DeviceCard({ device, viewMode, categoryColors, onDelete }: DeviceCardProps) {
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/device/${device.smartLinkId}`;
+    const shareUrl = `${window.location.origin}/medication/${device.smartLinkId}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
           title: device.name,
-          text: `Check out ${device.name} by ${device.company}`,
+          text: `Check out ${device.name} by ${device.manufacturer}`,
           url: shareUrl,
         });
       } catch (error) {
         // Fallback to clipboard
         navigator.clipboard.writeText(shareUrl);
-        alert('Device link copied to clipboard!');
+        alert('Drug link copied to clipboard!');
       }
     } else {
       navigator.clipboard.writeText(shareUrl);
-      alert('Device link copied to clipboard!');
+      alert('Drug link copied to clipboard!');
     }
   };
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete ${device.name}?`)) {
-      // This would trigger the Cedar agent's deleteDevice action
-      console.log('Deleting device:', device.id);
+      if (onDelete) {
+        onDelete(device.id);
+      } else {
+        console.log('No delete handler provided');
+      }
     }
   };
 
@@ -74,15 +78,15 @@ export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps
             </div>
           </div>
 
-          {/* Device Info */}
+          {/* Drug Info */}
           <div className="flex-grow min-w-0">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-              <div className="flex-grow">
+            <div className="flex flex-col gap-4">
+              <div className="flex-grow min-w-0">
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">
                       <Link
-                        href={`/device/${device.smartLinkId}`}
+                        href={`/medication/${device.smartLinkId}`}
                         className="hover:text-gray-600 transition-colors"
                       >
                         {device.name}
@@ -90,7 +94,7 @@ export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps
                     </h3>
                     <p className="text-sm text-gray-600 flex items-center gap-1">
                       <Building2 className="w-4 h-4" />
-                      {device.company}
+                      {device.manufacturer}
                     </p>
                   </div>
                 </div>
@@ -121,18 +125,18 @@ export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleShare}
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-1 whitespace-nowrap"
                 >
                   <Share2 className="w-4 h-4" />
                   Share
                 </Button>
                 <Link href={`/profile/devices/${device.id}/edit`}>
-                  <Button variant="outline" size="sm" className="flex items-center gap-1">
+                  <Button variant="outline" size="sm" className="flex items-center gap-1 whitespace-nowrap">
                     <Edit className="w-4 h-4" />
                     Edit
                   </Button>
@@ -141,7 +145,7 @@ export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps
                   variant="outline"
                   size="sm"
                   onClick={handleDelete}
-                  className="flex items-center gap-1 text-gray-600 border-gray-200 hover:bg-gray-50"
+                  className="flex items-center gap-1 text-red-600 border-red-200 hover:bg-red-50 whitespace-nowrap"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete
@@ -156,7 +160,7 @@ export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-      {/* Device Image */}
+      {/* Drug Image */}
       <div className="aspect-video bg-gray-100 overflow-hidden">
         {device.imageUrls[0] ? (
           <Image
@@ -179,7 +183,7 @@ export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps
           <div className="flex-grow min-w-0">
             <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
               <Link
-                href={`/device/${device.smartLinkId}`}
+                href={`/medication/${device.smartLinkId}`}
                 className="hover:text-gray-600 transition-colors"
               >
                 {device.name}
@@ -187,11 +191,11 @@ export function DeviceCard({ device, viewMode, categoryColors }: DeviceCardProps
             </h3>
             <p className="text-sm text-gray-600 flex items-center gap-1 truncate">
               <Building2 className="w-4 h-4 flex-shrink-0" />
-              {device.company}
+              {device.manufacturer}
             </p>
           </div>
           <a
-            href={device.companyProductUrl}
+            href={device.manufacturerProductUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0 ml-2"

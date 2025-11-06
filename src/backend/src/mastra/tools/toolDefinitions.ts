@@ -52,6 +52,36 @@ export const CampaignEmailGenerationSchema = z.object({
     .describe('Additional context or specific points to include in the email'),
 });
 
+// Schema for medication addition tool
+export const AddMedicationSchema = z.object({
+  medicationName: z
+    .string()
+    .min(1, 'Medication name cannot be empty')
+    .describe('Name of the medication to add (e.g., Tylenol, Aspirin, Lisinopril)'),
+  genericName: z
+    .string()
+    .optional()
+    .describe('Generic name of the medication if different from brand name'),
+  dosage: z.string().optional().describe('Dosage information (e.g., 500mg, 10mg/ml)'),
+  manufacturer: z.string().optional().describe('Manufacturer name if specified'),
+  therapeuticClass: z
+    .string()
+    .optional()
+    .describe('Therapeutic class or category (e.g., Analgesic, Antibiotic, Cardiovascular)'),
+  includeImage: z
+    .boolean()
+    .default(true)
+    .describe('Whether to fetch and include medication images'),
+  includeClinicalData: z
+    .boolean()
+    .default(true)
+    .describe('Whether to fetch clinical trial and study information'),
+  additionalNotes: z
+    .string()
+    .optional()
+    .describe('Any additional notes or specific requirements for the medication'),
+});
+
 // Error response schema
 export const ErrorResponseSchema = z.object({
   error: z.string(),
@@ -95,6 +125,18 @@ export const generateCampaignEmailTool = createMastraToolForFrontendTool(
   },
 );
 
+export const addMedicationTool = createMastraToolForFrontendTool(
+  'addMedication',
+  AddMedicationSchema,
+  {
+    description:
+      'Add a new medication to the database with comprehensive information including images, clinical data, and therapeutic details. Automatically fetches medication images, clinical trial information, FDA data, and relevant studies from reliable sources.',
+    toolId: 'addMedication',
+    streamEventFn: streamJSONEvent,
+    errorSchema: ErrorResponseSchema,
+  },
+);
+
 export const requestAdditionalContextTool = createRequestAdditionalContextTool();
 
 /**
@@ -109,6 +151,9 @@ export const TOOL_REGISTRY = {
   campaigns: {
     generateCampaignEmailTool,
   },
+  medications: {
+    addMedicationTool,
+  },
   context: {
     requestAdditionalContextTool,
   },
@@ -119,5 +164,6 @@ export const ALL_TOOLS = [
   queryClinicalDataTool,
   downloadClinicalFileTool,
   generateCampaignEmailTool,
+  addMedicationTool,
   requestAdditionalContextTool,
 ];

@@ -10,10 +10,10 @@ import {
 
 import { PublicDevicePage } from '@/components/medical-device/PublicDevicePage';
 import { FloatingCedarChat } from '@/cedar/components/chatComponents/FloatingCedarChat';
-import { mockClinicalChatResponses, MedicalDevice } from '@/lib/mockData';
+import { mockClinicalChatResponses, PrescriptionDrug } from '@/lib/mockData';
 
 interface DevicePageClientProps {
-  device: MedicalDevice;
+  device: PrescriptionDrug;
 }
 
 export function DevicePageClient({ device }: DevicePageClientProps) {
@@ -32,6 +32,35 @@ export function DevicePageClient({ device }: DevicePageClientProps) {
     timeSpent: 0,
     chatInteractions: 0,
   });
+
+  const [documentContext, setDocumentContext] = React.useState<string>('');
+
+  // Fetch documents from database when component mounts
+  React.useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const response = await fetch(`/api/documents?listingId=${device.id}`);
+        const data = await response.json();
+
+        if (data.success && data.documents) {
+          // Combine all extracted text from documents
+          interface DocumentData {
+            extracted_text?: string;
+          }
+          const combinedText = data.documents
+            .map((doc: DocumentData) => doc.extracted_text || '')
+            .filter((text: string) => text.length > 0)
+            .join('\n\n');
+
+          setDocumentContext(combinedText);
+        }
+      } catch (error) {
+        console.error('Error fetching documents:', error);
+      }
+    };
+
+    fetchDocuments();
+  }, [device.id]);
 
   // Register device state for Cedar
   useRegisterState({
@@ -85,6 +114,15 @@ export function DevicePageClient({ device }: DevicePageClientProps) {
     },
   });
 
+  // Register document context state for Cedar chatbot
+  useRegisterState({
+    key: 'documentContext',
+    description: 'Extracted text from all PDF documents for this device listing',
+    value: documentContext,
+    setValue: () => {}, // Read-only
+    stateSetters: {},
+  });
+
   // Register chat history state
   useRegisterState({
     key: 'clinicalChat',
@@ -125,9 +163,9 @@ export function DevicePageClient({ device }: DevicePageClientProps) {
   // Subscribe states to Cedar context
   useSubscribeStateToAgentContext(
     'publicDevice',
-    (device: MedicalDevice) => ({
-      deviceName: device.name,
-      company: device.company,
+    (device: PrescriptionDrug) => ({
+      drugName: device.name,
+      manufacturer: device.manufacturer,
       categories: device.tags,
       clinicalFilesCount: device.clinicalFiles.length,
       hasImages: device.imageUrls.length > 0,
@@ -151,11 +189,28 @@ export function DevicePageClient({ device }: DevicePageClientProps) {
     },
   );
 
+  // Subscribe document context to Cedar agent - this injects PDF text into LLM prompts
+  const DOCUMENT_CONTEXT_PREVIEW_LENGTH = 2000; // Characters to show in preview
+  
+  useSubscribeStateToAgentContext(
+    'documentContext',
+    (context: string) => ({
+      hasDocumentContext: context.length > 0,
+      documentTextLength: context.length,
+      documentText: context.substring(0, DOCUMENT_CONTEXT_PREVIEW_LENGTH), // First N chars for context
+      fullDocumentText: context, // Full text available to agent
+    }),
+    {
+      showInChat: true,
+      color: '#10B981',
+    },
+  );
+
   // Frontend tools for device interaction
   useRegisterFrontendTool({
     name: 'queryClinicalData',
     description:
-      'Answer questions about clinical evidence, safety data, efficacy studies, and research findings for this medical device',
+      'Answer questions about clinical evidence, safety data, efficacy studies, and research findings for this medical device. Uses extracted text from PDF documents.',
     argsSchema: z.object({
       query: z
         .string()
@@ -164,7 +219,10 @@ export function DevicePageClient({ device }: DevicePageClientProps) {
         ),
     }),
     execute: async (args: { query: string }) => {
-      const response = generateClinicalResponse(args.query, device);
+      // Use document context if available, otherwise fall back to mock data
+      const response = documentContext
+        ? generateClinicalResponseWithContext(args.query, device, documentContext)
+        : generateClinicalResponse(args.query, device);
 
       const newEntry = {
         id: Date.now().toString(),
@@ -239,7 +297,7 @@ export function DevicePageClient({ device }: DevicePageClientProps) {
 }
 
 // Helper function to generate clinical responses
-function generateClinicalResponse(query: string, device: MedicalDevice): string {
+function generateClinicalResponse(query: string, device: PrescriptionDrug): string {
   const queryLower = query.toLowerCase();
 
   // Check for specific keywords in the query
@@ -300,4 +358,58 @@ function generateClinicalResponse(query: string, device: MedicalDevice): string 
 
   // Default response
   return `I can help you understand the clinical evidence for the ${device.name}. I have access to ${device.clinicalFiles.length} research files including clinical trials, safety studies, and FDA documentation.\n\nI can provide information about clinical efficacy and success rates, safety data and adverse events, comparative studies vs. other devices, battery life and technical specifications, MRI compatibility and imaging safety, and FDA approval status and regulatory information.\n\nWhat specific clinical evidence would you like to know about?`;
+}
+
+// Helper function to generate clinical responses using document context
+function generateClinicalResponseWithContext(
+  query: string,
+  device: PrescriptionDrug,
+  documentContext: string,
+): string {
+  const queryLower = query.toLowerCase();
+
+  // If we have document context, search within it
+  if (documentContext && documentContext.length > 0) {
+    // Simple keyword-based search in document context
+    const sentences = documentContext.split(/[.!?]+/).filter((s) => s.trim().length > 0);
+
+    // Common stopwords to exclude from keyword search
+    const STOPWORDS = [
+      'this',
+      'that',
+      'what',
+      'about',
+      'with',
+      'from',
+      'have',
+      'they',
+      'will',
+      'would',
+      'there',
+      'their',
+      'when',
+      'where',
+      'which',
+    ];
+
+    // Find sentences containing query keywords
+    const keywords = queryLower
+      .split(/\s+/)
+      .filter((word) => word.length > 3 && !STOPWORDS.includes(word));
+
+    const relevantSentences = sentences.filter((sentence) => {
+      const sentenceLower = sentence.toLowerCase();
+      return keywords.some((keyword) => sentenceLower.includes(keyword));
+    });
+
+    if (relevantSentences.length > 0) {
+      // Return the most relevant sentences
+      const MAX_SENTENCES = 3;
+      const response = relevantSentences.slice(0, MAX_SENTENCES).join('. ') + '.';
+      return `Based on the clinical documentation for ${device.name}:\n\n${response}`;
+    }
+  }
+
+  // Fall back to the original response generator if no context match
+  return generateClinicalResponse(query, device);
 }
