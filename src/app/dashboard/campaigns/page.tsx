@@ -5,7 +5,7 @@ import { DashboardLayout } from '@/components/medical-device/DashboardLayout';
 import { SmartCampaignBuilder } from '@/components/medical-device/SmartCampaignBuilder';
 import { CampaignManager } from '@/components/medical-device/CampaignManager';
 import { FloatingCedarChat } from '@/cedar/components/chatComponents/FloatingCedarChat';
-import { mockDrugs } from '@/lib/mockData';
+import { mockDrugs, PrescriptionDrug } from '@/lib/mockData';
 import { Plus, Target, Sparkles, BarChart3 } from 'lucide-react';
 import { Button } from '@/cedar/components/ui/button';
 
@@ -26,6 +26,48 @@ interface Campaign {
 
 export default function CampaignsPage() {
   const [activeTab, setActiveTab] = useState<'create' | 'manage' | 'analytics'>('create');
+
+  // Dynamic drug list that includes newly added medications
+  const [drugs, setDrugs] = useState<PrescriptionDrug[]>(() => {
+    // Load from localStorage on mount, fallback to mockDrugs
+    if (typeof window !== 'undefined') {
+      const storedDrugs = localStorage.getItem('drugs');
+      if (storedDrugs) {
+        try {
+          return JSON.parse(storedDrugs);
+        } catch {
+          return mockDrugs;
+        }
+      }
+    }
+    return mockDrugs;
+  });
+
+  // Update drugs when localStorage changes (e.g., when new medications are added)
+  React.useEffect(() => {
+    const handleStorageChange = () => {
+      const storedDrugs = localStorage.getItem('drugs');
+      if (storedDrugs) {
+        try {
+          setDrugs(JSON.parse(storedDrugs));
+        } catch {
+          setDrugs(mockDrugs);
+        }
+      }
+    };
+
+    // Listen for storage changes
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also check for changes periodically (in case of same-tab updates)
+    const interval = setInterval(handleStorageChange, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
   const [campaigns, setCampaigns] = useState<Campaign[]>([
     // Mock campaigns for demonstration
     {
@@ -134,7 +176,7 @@ export default function CampaignsPage() {
 
         {/* Tab Content */}
         {activeTab === 'create' && (
-          <SmartCampaignBuilder drugs={mockDrugs} onCampaignLaunched={handleCampaignLaunched} />
+          <SmartCampaignBuilder drugs={drugs} onCampaignLaunched={handleCampaignLaunched} />
         )}
 
         {activeTab === 'manage' && (

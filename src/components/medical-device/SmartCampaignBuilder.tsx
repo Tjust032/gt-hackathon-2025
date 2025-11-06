@@ -165,6 +165,13 @@ export function SmartCampaignBuilder({ drugs, onCampaignLaunched }: SmartCampaig
       return;
     }
 
+    // Find the selected drug object
+    const selectedDrugObject = drugs.find((d) => d.id === selectedDrug);
+    if (!selectedDrugObject) {
+      alert('Selected drug not found. Please refresh and try again.');
+      return;
+    }
+
     setShowQuickLaunchModal(true);
     setIsGenerating(true);
     setIsStreaming(true);
@@ -180,6 +187,7 @@ export function SmartCampaignBuilder({ drugs, onCampaignLaunched }: SmartCampaig
         },
         body: JSON.stringify({
           drugId: selectedDrug,
+          drug: selectedDrugObject, // Include the full drug object
           hcpTags,
           campaignType,
           variables,

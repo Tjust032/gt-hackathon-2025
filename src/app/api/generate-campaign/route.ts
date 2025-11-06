@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { mockDrugs, mockSalesRep } from '@/lib/mockData';
+import { mockDrugs, mockSalesRep, ClinicalFile } from '@/lib/mockData';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -9,30 +9,33 @@ const openai = new OpenAI({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { drugId, hcpTags, campaignType } = body;
+    const { drugId, drug, hcpTags, campaignType } = body;
 
-    // Find the drug
-    const drug = mockDrugs.find((d) => d.id === drugId);
-    if (!drug) {
-      return NextResponse.json({ error: 'Drug not found' }, { status: 404 });
+    // Use the provided drug object, or fallback to lookup in mockDrugs
+    let selectedDrug = drug;
+    if (!selectedDrug) {
+      selectedDrug = mockDrugs.find((d) => d.id === drugId);
+      if (!selectedDrug) {
+        return NextResponse.json({ error: 'Drug not found' }, { status: 404 });
+      }
     }
 
     // Compile drug information
     const drugInfo = {
-      name: drug.name,
-      genericName: drug.genericName,
-      manufacturer: drug.manufacturer,
-      description: drug.description,
-      smartLinkUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/medication/${drug.smartLinkId}`,
-      clinicalEvidence: drug.clinicalFiles.map((file) => ({
+      name: selectedDrug.name,
+      genericName: selectedDrug.genericName,
+      manufacturer: selectedDrug.manufacturer,
+      description: selectedDrug.description,
+      smartLinkUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/medication/${selectedDrug.smartLinkId}`,
+      clinicalEvidence: selectedDrug.clinicalFiles.map((file: ClinicalFile) => ({
         title: file.filename,
         description: file.description,
         content: file.extractedContent?.substring(0, 500) + '...', // Truncate for prompt
       })),
-      tags: drug.tags,
-      therapeuticClass: drug.therapeuticClass,
-      dosageForm: drug.dosageForm,
-      strength: drug.strength,
+      tags: selectedDrug.tags,
+      therapeuticClass: selectedDrug.therapeuticClass,
+      dosageForm: selectedDrug.dosageForm,
+      strength: selectedDrug.strength,
     };
 
     // Create the prompt for structured email generation
@@ -52,7 +55,7 @@ export async function POST(request: NextRequest) {
 **Clinical Evidence:**
 ${drugInfo.clinicalEvidence
   .map(
-    (evidence) =>
+    (evidence: { title: string; description: string; content: string }) =>
       `- ${evidence.title}: ${evidence.description}\n  Key findings: ${evidence.content}`,
   )
   .join('\n')}
